@@ -1,5 +1,7 @@
 # NVIM Guide
 
+[![Deploy to GitHub Pages](https://github.com/Johanmkr/VimPractice/actions/workflows/deploy.yml/badge.svg)](https://johanmkr.github.io/VimPractice/)
+
 A static, interactive reference site for learning Neovim — hosted on GitHub Pages.
 
 ## Pages
