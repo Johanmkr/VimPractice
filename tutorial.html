@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Tutorial — Navigation for VS Code Users</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    html, body { height: 100%; overflow: hidden; }
+    body { display: flex; flex-direction: column; }
+
+    /* ── SLIDESHOW SHELL ─── */
+    .tut-shell {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* progress bar across the top */
+    .tut-progress {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.55rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      flex-shrink: 0;
+    }
+    .tut-counter {
+      font-size: 0.75rem;
+      color: var(--fg3);
+      white-space: nowrap;
+    }
+    .tut-dots {
+      display: flex;
+      gap: 6px;
+      flex: 1;
+    }
+    .tut-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .tut-dot.done { background: var(--green); border-color: var(--green); }
+    .tut-dot.active { background: var(--accent); border-color: var(--accent); transform: scale(1.3); }
+    .tut-title-bar {
+      font-size: 0.82rem;
+      color: var(--fg2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+    }
+
+    /* ── MAIN AREA ─── */
+    .tut-main {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* plain slide (no exercise) */
+    .slide-plain {
+      flex: 1;
+      overflow-y: auto;
+      padding: 3rem 2rem;
+      max-width: 860px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .slide-plain h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      line-height: 1.2;
+    }
+    .slide-plain h1 .hl { color: var(--accent); }
+    .slide-plain h1 .hl-g { color: var(--green); }
+    .slide-plain .subtitle {
+      color: var(--fg3);
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+    }
+
+    /* split slide (with exercise) */
+    .slide-split {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      overflow: hidden;
+    }
+    .slide-explain {
+      overflow-y: auto;
+      padding: 1.8rem 1.6rem;
+      border-right: 1px solid var(--border);
+    }
+    .slide-explain h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .slide-explain .slide-sub {
+      color: var(--fg3);
+      font-size: 0.83rem;
+      margin-bottom: 1.4rem;
+    }
+    .slide-explain p {
+      color: var(--fg2);
+      font-size: 0.88rem;
+      line-height: 1.7;
+      margin-bottom: 0.9rem;
+    }
+
+    .key-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.55rem;
+    }
+    .key-row .key-desc {
+      color: var(--fg2);
+      font-size: 0.85rem;
+    }
+
+    .slide-exercise {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* ── MINI EDITOR ─── */
+    .mini-editor {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      outline: none;
+      cursor: text;
+      position: relative;
+    }
+    .mini-editor-topbar {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      padding: 0.35rem 0.8rem;
+      font-size: 0.78rem;
+      color: var(--fg3);
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .mini-editor-filename { color: var(--fg2); }
+    .mini-editor-lines {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.3rem 0;
+      font-size: 14px;
+      line-height: 21px;
+    }
+    .mini-editor-line {
+      display: flex;
+      min-height: 21px;
+    }
+    .mini-ln {
+      color: var(--fg3);
+      text-align: right;
+      padding: 0 0.6rem 0 0.4rem;
+      min-width: 34px;
+      user-select: none;
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+    .mini-editor-line.cur-line .mini-ln { color: var(--fg2); }
+    .mini-lc {
+      flex: 1;
+      white-space: pre;
+      padding-right: 1rem;
+      font-size: 14px;
+    }
+    .mini-editor-line.cur-line .mini-lc { background: rgba(255,255,255,0.03); }
+    .cur-char {
+      background: var(--fg);
+      color: var(--bg2);
+      border-radius: 1px;
+    }
+    .cur-char.ins {
+      background: transparent;
+      color: inherit;
+      border-left: 2px solid var(--green);
+      margin-left: -1px;
+    }
+
+    .mini-statusline {
+      padding: 0.18rem 0.8rem;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      flex-shrink: 0;
+      min-height: 22px;
+      letter-spacing: 0.02em;
+    }
+    .mini-statusline.ins-mode { background: var(--green); }
+    .mini-statusline.search-mode { background: var(--yellow); color: var(--bg); }
+
+    .mini-cmdline {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 0.18rem 0.8rem;
+      font-size: 0.83rem;
+      min-height: 22px;
+      color: var(--fg);
+      flex-shrink: 0;
+    }
+
+    /* ── GOAL STRIP ─── */
+    .goal-strip {
+      background: var(--bg3);
+      border-top: 1px solid var(--border);
+      padding: 0.6rem 1rem;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+    }
+    .goal-strip .gs-label {
+      font-size: 0.66rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg3);
+      margin-bottom: 0.2rem;
+    }
+    .goal-strip .gs-text { color: var(--fg2); }
+    .goal-strip .gs-text .hl { color: var(--teal); font-weight: 700; }
+    .goal-strip .gs-complete {
+      color: var(--green);
+      font-weight: 700;
+      display: none;
+    }
+    .goal-strip.complete .gs-text { display: none; }
+    .goal-strip.complete .gs-complete { display: block; }
+    .goal-strip.complete { background: rgba(158,206,106,0.08); border-color: var(--green); }
+
+    /* ── FOOTER NAV ─── */
+    .tut-footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 0.6rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--fg2);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 0.45rem 1.1rem;
+      cursor: pointer;
+      transition: all 0.13s;
+    }
+    .nav-btn:hover:not(:disabled) { background: var(--bg4); color: var(--fg); border-color: var(--fg3); }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+    .nav-btn.primary:hover:not(:disabled) { background: #89b4ff; }
+
+    .tut-hint-btn {
+      background: none;
+      border: none;
+      color: var(--fg3);
+      font-family: inherit;
+      font-size: 0.78rem;
+      cursor: pointer;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      transition: color 0.12s;
+    }
+    .tut-hint-btn:hover { color: var(--yellow); }
+
+    /* ── WELCOME / DONE SLIDES ─── */
+    .slide-center {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-y: auto;
+    }
+    .slide-center-inner {
+      max-width: 700px;
+      padding: 3rem 2rem;
+      width: 100%;
+    }
+    .slide-center-inner h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 0.8rem;
+    }
+    .slide-center-inner .big-sub {
+      color: var(--fg3);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* mode diagram */
+    .mode-diagram {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+    }
+    .mode-pill {
+      border-radius: 6px;
+      padding: 0.7rem 1.2rem;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .mode-pill .mp-name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .mode-pill .mp-key { font-size: 0.75rem; color: var(--fg3); margin-top: 0.2rem; }
+    .mode-pill.normal { border-color: var(--accent); background: rgba(122,162,247,0.08); }
+    .mode-pill.normal .mp-name { color: var(--accent); }
+    .mode-pill.insert { border-color: var(--green); background: rgba(158,206,106,0.08); }
+    .mode-pill.insert .mp-name { color: var(--green); }
+    .mode-pill.search { border-color: var(--yellow); background: rgba(224,175,104,0.08); }
+    .mode-pill.search .mp-name { color: var(--yellow); }
+    .mode-arrow { color: var(--fg3); font-size: 1.1rem; }
+
+    .tut-link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.8rem;
+      margin-top: 1.5rem;
+    }
+    .tut-link-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-decoration: none;
+      color: var(--fg);
+      transition: border-color 0.13s;
+      display: block;
+    }
+    .tut-link-card:hover { border-color: var(--accent); }
+    .tut-link-card .tlc-title { font-weight: 700; font-size: 0.9rem; color: var(--accent); margin-bottom: 0.3rem; }
+    .tut-link-card .tlc-desc { font-size: 0.78rem; color: var(--fg3); }
+
+    /* focus ring on editor */
+    .mini-editor:focus { outline: 1px solid var(--accent); outline-offset: -1px; }
+
+    .click-to-start {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(26,27,38,0.75);
+      z-index: 5;
+      font-size: 0.85rem;
+      color: var(--fg3);
+      pointer-events: none;
+      transition: opacity 0.2s;
+      border-radius: 0;
+    }
+    .mini-editor:focus .click-to-start { opacity: 0; }
+
+    @media (max-width: 850px) {
+      .slide-split { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+      .slide-explain { border-right: none; border-bottom: 1px solid var(--border); max-height: 40%; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="index.html">Basics</a></li>
+    <li><a href="advanced.html">Advanced</a></li>
+    <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="vscode-to-nvim.html">VS Code → Nvim</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+    <li><a href="practice.html">Practice</a></li>
+  </ul>
+</nav>
+
+<div class="tut-shell">
+  <div class="tut-progress">
+    <span class="tut-counter" id="tut-counter">1 / 12</span>
+    <div class="tut-dots" id="tut-dots"></div>
+    <span class="tut-title-bar" id="tut-title-bar"></span>
+  </div>
+
+  <div class="tut-main" id="tut-main"></div>
+
+  <div class="tut-footer">
+    <button class="nav-btn" id="prev-btn" disabled>← Back</button>
+    <button class="tut-hint-btn" id="hint-btn" style="display:none">Show hint</button>
+    <button class="nav-btn primary" id="next-btn">Next →</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// MINI VIM ENGINE
+// ─────────────────────────────────────────────
+
+class VimEngine {
+  constructor(lines) {
+    this.initialLines = lines.map(l => l);
+    this.reset();
+  }
+
+  reset() {
+    this.lines = this.initialLines.map(l => l);
+    this.cur = { row: 0, col: 0 };
+    this.mode = 'normal';   // 'normal' | 'insert' | 'search'
+    this.sub = 'normal';    // 'normal' | 'g' | 'd_pending'
+    this.clipboard = { linewise: true, text: '' };
+    this.undoStack = [];
+    this.redoStack = [];
+    this.lastChange = null; // 'dd' | 'x' | null
+    this.searchQuery = '';
+    this.searchDir = 1;
+    this.cmdBuf = '';
+    this.msg = '';
+    // tracking for exercise checks
+    this.usedDollar = false;
+    this.usedZero = false;
+    this.visitedTop = false;
+    this.visitedBottom = false;
+    this.nPresses = 0;
+    this.undoCount = 0;
+    this.insertedText = '';
+  }
+
+  saveUndo() {
+    this.undoStack.push({ lines: this.lines.map(l => l), cur: { ...this.cur } });
+    this.redoStack = [];
+  }
+
+  clamp() {
+    const nr = this.lines.length;
+    this.cur.row = Math.max(0, Math.min(nr - 1, this.cur.row));
+    const len = this.lines[this.cur.row].length;
+    if (this.mode === 'insert') {
+      this.cur.col = Math.max(0, Math.min(len, this.cur.col));
+    } else {
+      this.cur.col = Math.max(0, Math.min(Math.max(0, len - 1), this.cur.col));
+    }
+  }
+
+  moveCol(d) {
+    const len = this.lines[this.cur.row].length;
+    this.cur.col = Math.max(0, Math.min(Math.max(0, len - 1), this.cur.col + d));
+  }
+
+  moveRow(d) {
+    this.cur.row = Math.max(0, Math.min(this.lines.length - 1, this.cur.row + d));
+    this.clamp();
+  }
+
+  wordFwd() {
+    const line = this.lines[this.cur.row];
+    let col = this.cur.col;
+    const isW = c => /\w/.test(c);
+    // move off current word/space
+    if (col < line.length) {
+      if (isW(line[col])) { while (col < line.length && isW(line[col])) col++; }
+      else                { while (col < line.length && !isW(line[col])) col++; }
+    }
+    if (col < line.length) { this.cur.col = col; return; }
+    // wrap to next line
+    if (this.cur.row < this.lines.length - 1) {
+      this.cur.row++;
+      const next = this.lines[this.cur.row];
+      col = 0;
+      while (col < next.length && !isW(next[col])) col++;
+      this.cur.col = Math.min(col, Math.max(0, next.length - 1));
+    }
+  }
+
+  wordBwd() {
+    let col = this.cur.col - 1;
+    const isW = c => /\w/.test(c);
+    if (col < 0) {
+      if (this.cur.row > 0) {
+        this.cur.row--;
+        const prev = this.lines[this.cur.row];
+        col = prev.length - 1;
+        while (col > 0 && !isW(prev[col])) col--;
+        while (col > 0 && isW(prev[col - 1])) col--;
+        this.cur.col = Math.max(0, col);
+      }
+      return;
+    }
+    const line = this.lines[this.cur.row];
+    while (col > 0 && !isW(line[col])) col--;
+    while (col > 0 && isW(line[col - 1])) col--;
+    this.cur.col = Math.max(0, col);
+  }
+
+  wordEnd() {
+    const line = this.lines[this.cur.row];
+    let col = this.cur.col + 1;
+    const isW = c => /\w/.test(c);
+    if (col < line.length) {
+      while (col < line.length - 1 && !isW(line[col])) col++;
+      while (col < line.length - 1 && isW(line[col + 1])) col++;
+      this.cur.col = col;
+    }
+  }
+
+  deleteLine() {
+    this.saveUndo();
+    this.clipboard = { linewise: true, text: this.lines[this.cur.row] };
+    this.lines.splice(this.cur.row, 1);
+    if (this.lines.length === 0) this.lines = [''];
+    this.clamp();
+    this.lastChange = 'dd';
+  }
+
+  yankLine() {
+    this.clipboard = { linewise: true, text: this.lines[this.cur.row] };
+  }
+
+  paste(below) {
+    if (!this.clipboard.text && this.clipboard.text !== '') return;
+    this.saveUndo();
+    if (this.clipboard.linewise) {
+      const at = below ? this.cur.row + 1 : this.cur.row;
+      this.lines.splice(at, 0, this.clipboard.text);
+      this.cur.row = at;
+      this.cur.col = 0;
+    } else {
+      const line = this.lines[this.cur.row];
+      const ins = below ? this.cur.col + 1 : this.cur.col;
+      this.lines[this.cur.row] = line.slice(0, ins) + this.clipboard.text + line.slice(ins);
+      this.cur.col = ins + this.clipboard.text.length - 1;
+    }
+  }
+
+  findMatch(query, dir, startRow, startCol) {
+    if (!query) return null;
+    const re = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    const n = this.lines.length;
+    for (let i = 0; i < n; i++) {
+      const row = ((startRow + dir * (i + 1)) % n + n) % n;
+      const line = this.lines[row];
+      const match = line.match(re);
+      if (match) return { row, col: match.index };
+    }
+    // check current line after cursor
+    const cur = this.lines[startRow];
+    const sub = dir > 0 ? cur.slice(startCol + 1) : cur.slice(0, startCol);
+    const m2 = sub.match(re);
+    if (m2) return { row: startRow, col: dir > 0 ? startCol + 1 + m2.index : m2.index };
+    return null;
+  }
+
+  nextMatch(dir) {
+    const m = this.findMatch(this.searchQuery, dir, this.cur.row, this.cur.col);
+    if (m) { this.cur.row = m.row; this.cur.col = m.col; }
+    else { this.msg = 'Pattern not found'; }
+  }
+
+  undo() {
+    if (!this.undoStack.length) { this.msg = 'Already at oldest change'; return; }
+    this.redoStack.push({ lines: this.lines.map(l => l), cur: { ...this.cur } });
+    const snap = this.undoStack.pop();
+    this.lines = snap.lines;
+    this.cur = snap.cur;
+    this.undoCount++;
+  }
+
+  redo() {
+    if (!this.redoStack.length) { this.msg = 'Already at newest change'; return; }
+    this.undoStack.push({ lines: this.lines.map(l => l), cur: { ...this.cur } });
+    const snap = this.redoStack.pop();
+    this.lines = snap.lines;
+    this.cur = snap.cur;
+  }
+
+  handleKey(key) {
+    this.msg = '';
+    if (this.mode === 'insert') { this.doInsert(key); }
+    else if (this.mode === 'search') { this.doSearch(key); }
+    else { this.doNormal(key); }
+    this.clamp();
+  }
+
+  doNormal(key) {
+    // pending g (for gg)
+    if (this.sub === 'g') {
+      this.sub = 'normal';
+      if (key === 'g') { this.cur.row = 0; this.cur.col = 0; this.visitedTop = true; }
+      return;
+    }
+    // pending d (for dd)
+    if (this.sub === 'd_pending') {
+      this.sub = 'normal';
+      if (key === 'd') this.deleteLine();
+      return;
+    }
+    // pending y (for yy)
+    if (this.sub === 'y_pending') {
+      this.sub = 'normal';
+      if (key === 'y') this.yankLine();
+      return;
+    }
+
+    switch (key) {
+      case 'h': this.moveCol(-1); break;
+      case 'l': this.moveCol(1); break;
+      case 'j': this.moveRow(1); break;
+      case 'k': this.moveRow(-1); break;
+      case 'w': this.wordFwd(); break;
+      case 'b': this.wordBwd(); break;
+      case 'e': this.wordEnd(); break;
+      case '0': this.cur.col = 0; this.usedZero = true; break;
+      case '^': {
+        const m = this.lines[this.cur.row].search(/\S/);
+        this.cur.col = m >= 0 ? m : 0;
+        break;
+      }
+      case '$': {
+        this.cur.col = Math.max(0, this.lines[this.cur.row].length - 1);
+        this.usedDollar = true;
+        break;
+      }
+      case 'g': this.sub = 'g'; break;
+      case 'G': {
+        this.cur.row = this.lines.length - 1;
+        this.cur.col = 0;
+        this.visitedBottom = true;
+        break;
+      }
+      case 'i': this.mode = 'insert'; break;
+      case 'a': this.mode = 'insert'; this.cur.col = Math.min(this.lines[this.cur.row].length, this.cur.col + 1); break;
+      case 'A': this.mode = 'insert'; this.cur.col = this.lines[this.cur.row].length; break;
+      case 'I': {
+        const m = this.lines[this.cur.row].search(/\S/);
+        this.cur.col = m >= 0 ? m : 0;
+        this.mode = 'insert';
+        break;
+      }
+      case 'o': {
+        this.saveUndo();
+        this.lines.splice(this.cur.row + 1, 0, '');
+        this.cur.row++;
+        this.cur.col = 0;
+        this.mode = 'insert';
+        break;
+      }
+      case 'O': {
+        this.saveUndo();
+        this.lines.splice(this.cur.row, 0, '');
+        this.cur.col = 0;
+        this.mode = 'insert';
+        break;
+      }
+      case 'x': {
+        const line = this.lines[this.cur.row];
+        if (line.length > 0) {
+          this.saveUndo();
+          this.lines[this.cur.row] = line.slice(0, this.cur.col) + line.slice(this.cur.col + 1);
+          this.clamp();
+          this.lastChange = 'x';
+        }
+        break;
+      }
+      case 'd': this.sub = 'd_pending'; break;
+      case 'y': this.sub = 'y_pending'; break;
+      case 'p': this.paste(true); break;
+      case 'P': this.paste(false); break;
+      case 'u': this.undo(); break;
+      case 'C-r': this.redo(); break;
+      case '.': {
+        if (this.lastChange === 'dd') this.deleteLine();
+        else if (this.lastChange === 'x') {
+          const line = this.lines[this.cur.row];
+          if (line.length > 0) {
+            this.saveUndo();
+            this.lines[this.cur.row] = line.slice(0, this.cur.col) + line.slice(this.cur.col + 1);
+            this.clamp();
+          }
+        }
+        break;
+      }
+      case '/': this.mode = 'search'; this.searchDir = 1; this.cmdBuf = ''; break;
+      case 'n': this.nextMatch(this.searchDir); this.nPresses++; break;
+      case 'N': this.nextMatch(-this.searchDir); break;
+      case 'Esc': this.sub = 'normal'; break;
+    }
+  }
+
+  doInsert(key) {
+    if (key === 'Esc' || key === 'C-[') { this.mode = 'normal'; this.moveCol(-1); return; }
+    const row = this.cur.row;
+    const line = this.lines[row];
+    if (key === 'BS') {
+      if (this.cur.col > 0) {
+        this.lines[row] = line.slice(0, this.cur.col - 1) + line.slice(this.cur.col);
+        this.cur.col--;
+      } else if (row > 0) {
+        const prev = this.lines[row - 1];
+        this.lines[row - 1] = prev + line;
+        this.lines.splice(row, 1);
+        this.cur.row--;
+        this.cur.col = prev.length;
+      }
+      return;
+    }
+    if (key === 'CR') {
+      this.lines[row] = line.slice(0, this.cur.col);
+      this.lines.splice(row + 1, 0, line.slice(this.cur.col));
+      this.cur.row++;
+      this.cur.col = 0;
+      return;
+    }
+    if (key.length === 1) {
+      this.lines[row] = line.slice(0, this.cur.col) + key + line.slice(this.cur.col);
+      this.cur.col++;
+      this.insertedText += key;
+    }
+  }
+
+  doSearch(key) {
+    if (key === 'CR') {
+      this.searchQuery = this.cmdBuf;
+      this.mode = 'normal';
+      if (this.searchQuery) {
+        const m = this.findMatch(this.searchQuery, this.searchDir, this.cur.row, this.cur.col);
+        if (m) { this.cur.row = m.row; this.cur.col = m.col; }
+        else { this.msg = 'Pattern not found'; }
+      }
+      return;
+    }
+    if (key === 'Esc') { this.mode = 'normal'; this.cmdBuf = ''; return; }
+    if (key === 'BS') { this.cmdBuf = this.cmdBuf.slice(0, -1); return; }
+    if (key.length === 1) this.cmdBuf += key;
+  }
+}
+
+// ─────────────────────────────────────────────
+// RENDERER
+// ─────────────────────────────────────────────
+
+function renderEngine(eng, linesEl, statusEl, cmdEl) {
+  linesEl.innerHTML = eng.lines.map((line, row) => {
+    const isCur = row === eng.cur.row;
+    let content = '';
+    if (line.length === 0) {
+      content = isCur ? '<span class="cur-char">&nbsp;</span>' : '&nbsp;';
+    } else {
+      for (let col = 0; col < line.length; col++) {
+        const ch = line[col] === '&' ? '&amp;' : line[col] === '<' ? '&lt;' : line[col] === '>' ? '&gt;' : line[col] === ' ' ? '&nbsp;' : line[col];
+        if (isCur && col === eng.cur.col) {
+          const cls = eng.mode === 'insert' ? 'cur-char ins' : 'cur-char';
+          content += `<span class="${cls}">${ch}</span>`;
+        } else {
+          content += ch;
+        }
+      }
+      if (isCur && eng.mode === 'insert' && eng.cur.col >= line.length) {
+        content += '<span class="cur-char ins">&nbsp;</span>';
+      }
+    }
+    return `<div class="mini-editor-line${isCur ? ' cur-line' : ''}"><span class="mini-ln">${row + 1}</span><span class="mini-lc">${content}</span></div>`;
+  }).join('');
+
+  const lineEls = linesEl.querySelectorAll('.mini-editor-line');
+  if (lineEls[eng.cur.row]) lineEls[eng.cur.row].scrollIntoView({ block: 'nearest' });
+
+  const modeMap = { normal: 'NORMAL', insert: 'INSERT', search: 'SEARCH' };
+  const clsMap = { insert: 'ins-mode', search: 'search-mode' };
+  statusEl.className = 'mini-statusline ' + (clsMap[eng.mode] || '');
+  statusEl.querySelector('.ms-mode').textContent = modeMap[eng.mode] || 'NORMAL';
+  statusEl.querySelector('.ms-pos').textContent = `${eng.cur.row + 1}:${eng.cur.col + 1}`;
+
+  if (eng.mode === 'search') { cmdEl.textContent = '/' + eng.cmdBuf; }
+  else if (eng.msg) { cmdEl.textContent = eng.msg; }
+  else if (eng.sub === 'g') { cmdEl.textContent = 'g'; }
+  else if (eng.sub === 'd_pending') { cmdEl.textContent = 'd'; }
+  else if (eng.sub === 'y_pending') { cmdEl.textContent = 'y'; }
+  else { cmdEl.textContent = ''; }
+}
+
+// ─────────────────────────────────────────────
+// SLIDE DEFINITIONS
+// ─────────────────────────────────────────────
+
+const SLIDES = [
+  // ── 0 WELCOME ──
+  {
+    title: 'Welcome',
+    render() {
+      return `<div class="slide-center"><div class="slide-center-inner">
+        <h1>Navigation in <span style="color:var(--accent)">Neovim</span><br>for <span style="color:var(--green)">VS Code</span> users</h1>
+        <p class="big-sub">12 short slides. Each one teaches one concept. Most have a live exercise you can try right in the browser.</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+          <div class="card" style="margin:0"><div class="card-title" style="color:var(--teal)">What you'll learn</div>
+            <ul style="padding-left:1rem;color:var(--fg2);font-size:0.85rem;line-height:1.9">
+              <li>Moving without a mouse</li><li>Word and line jumps</li>
+              <li>Entering and leaving insert mode</li><li>Deleting, yanking, pasting</li>
+              <li>Searching through a file</li><li>Undoing mistakes</li>
+            </ul>
+          </div>
+          <div class="card" style="margin:0"><div class="card-title" style="color:var(--teal)">How it works</div>
+            <ul style="padding-left:1rem;color:var(--fg2);font-size:0.85rem;line-height:1.9">
+              <li>Read the concept on the left</li>
+              <li>Click the editor on the right</li>
+              <li>Type the keys shown</li>
+              <li>Complete the goal to unlock <span style="color:var(--green)">✓</span></li>
+              <li>Use Back / Next to navigate</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout tip"><strong>Tip:</strong> Keep this page open alongside a real Neovim session and try the same keys there. Dual practice accelerates muscle memory.</div>
+      </div></div>`;
+    },
+  },
+
+  // ── 1 MODES ──
+  {
+    title: 'The Two Modes',
+    render() {
+      return `<div class="slide-center"><div class="slide-center-inner">
+        <h1>The <span style="color:var(--accent)">Most Important</span> Idea</h1>
+        <p class="big-sub">Every confusion in Neovim comes from misunderstanding modes.</p>
+        <div class="callout" style="margin-bottom:1.5rem">
+          <strong>VS Code is always in "insert mode."</strong> Every key you press types a character, and modifier keys (<kbd>Ctrl</kbd>, <kbd>Alt</kbd>) trigger actions.<br><br>
+          <strong>Neovim has two worlds.</strong> In <span style="color:var(--accent);font-weight:700">Normal mode</span> keys are <em>commands</em>, not characters. You switch to <span style="color:var(--green);font-weight:700">Insert mode</span> to type, then switch back.
+        </div>
+        <div class="mode-diagram">
+          <div class="mode-pill normal"><div class="mp-name">Normal</div><div class="mp-key">home base</div></div>
+          <div class="mode-arrow">→ <kbd>i</kbd> / <kbd>a</kbd> / <kbd>o</kbd> →</div>
+          <div class="mode-pill insert"><div class="mp-name">Insert</div><div class="mp-key">type text</div></div>
+          <div class="mode-arrow">→ <kbd>Esc</kbd> →</div>
+          <div class="mode-pill normal"><div class="mp-name">Normal</div><div class="mp-key">home base</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem">
+          <div class="card" style="margin:0"><div class="card-title" style="color:var(--accent)">Normal mode</div>
+            <p class="key-desc">The default. Every key is a <em>command</em>: move, delete, copy, search. You spend most of your time here. It is not idle — it is where editing happens.</p>
+          </div>
+          <div class="card" style="margin:0"><div class="card-title" style="color:var(--green)">Insert mode</div>
+            <p class="key-desc">Keys type characters, just like VS Code. You enter it intentionally, do your typing, and leave with <kbd>Esc</kbd>. Treat it as a temporary visit, not a home.</p>
+          </div>
+        </div>
+        <div class="callout tip" style="margin-top:1rem"><strong>Golden rule:</strong> If anything feels wrong, press <kbd>Esc</kbd>. It always returns you to Normal mode safely.</div>
+      </div></div>`;
+    },
+  },
+
+  // ── 2 hjkl ──
+  {
+    title: 'Moving: h j k l',
+    exercise: {
+      filename: 'navigation.txt',
+      goal: 'Move the cursor onto the word <span class="hl">TARGET</span> using <kbd>h</kbd> <kbd>j</kbd> <kbd>k</kbd> <kbd>l</kbd>',
+      hint: 'Press j to go down, l to go right. Try not to use arrow keys.',
+      lines: [
+        'Use  h j k l  to move (left, down, up, right).',
+        '',
+        'Start here and navigate down and right...',
+        '',
+        '               TARGET   <-- reach this word',
+        '',
+        'Remember: j=down  k=up  h=left  l=right',
+      ],
+      check: s => {
+        const line = s.lines[s.cur.row];
+        const idx = line && line.indexOf('TARGET');
+        return idx >= 0 && s.cur.col >= idx && s.cur.col < idx + 6;
+      },
+    },
+    render(exEl) {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>Moving Around: <span style="color:var(--orange)">h j k l</span></h2>
+          <p class="slide-sub">Your arrow keys — without leaving the home row</p>
+          <p>In VS Code you move with arrow keys. In Neovim you can too, but the preferred way is the four keys directly under your right hand in normal position.</p>
+          <div style="margin:1.2rem 0;padding:1rem;background:var(--bg3);border-radius:8px;border:1px solid var(--border)">
+            <div style="display:grid;grid-template-columns:auto 1fr;gap:0.4rem 1rem;align-items:center">
+              <kbd style="font-size:1.1rem">h</kbd><span class="key-desc">← left</span>
+              <kbd style="font-size:1.1rem">j</kbd><span class="key-desc">↓ down</span>
+              <kbd style="font-size:1.1rem">k</kbd><span class="key-desc">↑ up</span>
+              <kbd style="font-size:1.1rem">l</kbd><span class="key-desc">→ right</span>
+            </div>
+          </div>
+          <p>The reason: your fingers never leave the home row. Once it clicks, movement feels instant — no wrist movement to reach the arrow cluster.</p>
+          <div class="callout tip"><strong>Memory trick:</strong> <kbd>j</kbd> has a descender (the hook points down). <kbd>k</kbd> points up. <kbd>h</kbd> is leftmost, <kbd>l</kbd> is rightmost.</div>
+          <p style="margin-top:0.8rem">You can prefix a count: <kbd>5j</kbd> moves down 5 lines at once. <kbd>10l</kbd> jumps 10 chars right.</p>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 3 WORD JUMPS ──
+  {
+    title: 'Word Jumps: w b e',
+    exercise: {
+      filename: 'words.txt',
+      goal: 'Jump to the word <span class="hl">DESTINATION</span> using <kbd>w</kbd>',
+      hint: 'Press w repeatedly to jump forward one word at a time.',
+      lines: [
+        'one two three four five six seven eight',
+        'alpha beta gamma delta epsilon zeta eta',
+        'press w to hop across each word boundary',
+        'DESTINATION is at the start of this line',
+        'b jumps back one word  e jumps to word end',
+      ],
+      check: s => {
+        const line = s.lines[s.cur.row];
+        return line && line.startsWith('DESTINATION') && s.cur.col === 0;
+      },
+    },
+    render() {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>Word Jumps: <span style="color:var(--orange)">w b e</span></h2>
+          <p class="slide-sub">Stop pressing l 20 times</p>
+          <p>Once you have hjkl, the next leap in speed is word-level movement. Instead of character-by-character, jump whole words at a time.</p>
+          <div class="key-row"><kbd>w</kbd><span class="key-desc">jump to the <strong>start</strong> of the next word</span></div>
+          <div class="key-row"><kbd>b</kbd><span class="key-desc">jump <strong>back</strong> to the start of the previous word</span></div>
+          <div class="key-row"><kbd>e</kbd><span class="key-desc">jump to the <strong>end</strong> of the current word</span></div>
+          <p>Like hjkl, you can prefix a count: <kbd>3w</kbd> jumps three words forward.</p>
+          <div class="callout tip"><strong>From VS Code:</strong> <kbd>Ctrl+→</kbd> in VS Code moves one word right — that maps to <kbd>w</kbd> or <kbd>e</kbd> in Neovim.</div>
+          <p>There are also capital variants <kbd>W</kbd>, <kbd>B</kbd>, <kbd>E</kbd> that treat anything separated by whitespace as a word, ignoring punctuation.</p>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 4 LINE JUMPS ──
+  {
+    title: 'Line Jumps: 0 $ ^',
+    exercise: {
+      filename: 'lines.txt',
+      goal: 'Press <span class="hl">$</span> to reach the end of the line, then <span class="hl">0</span> to return to column 1',
+      hint: '$ jumps to end of line, 0 jumps to column 1.',
+      lines: [
+        'Jump to the end of this line with $ then back with 0',
+        'Then try ^ to skip leading spaces on the next line',
+        '    this line starts with spaces — ^ lands here',
+        'Mix these motions freely on any line',
+      ],
+      check: s => s.usedDollar && s.usedZero,
+    },
+    render() {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>Line Jumps: <span style="color:var(--orange)">0 $ ^</span></h2>
+          <p class="slide-sub">Jump to any part of the current line instantly</p>
+          <div class="key-row"><kbd>0</kbd><span class="key-desc">column 1 — absolute start of line</span></div>
+          <div class="key-row"><kbd>^</kbd><span class="key-desc">first non-blank character (skips indentation)</span></div>
+          <div class="key-row"><kbd>$</kbd><span class="key-desc">end of line</span></div>
+          <p style="margin-top:0.9rem">These combine with operators too. <kbd>d$</kbd> deletes from cursor to end of line. <kbd>y0</kbd> yanks from cursor back to column 1.</p>
+          <div class="callout tip"><strong>From VS Code:</strong> <kbd>Home</kbd> → <kbd>^</kbd> or <kbd>0</kbd>. <kbd>End</kbd> → <kbd>$</kbd>.</div>
+          <p>For <strong>file-level</strong> jumps:</p>
+          <div class="key-row"><kbd>g</kbd><kbd>g</kbd><span class="key-desc">first line of file</span></div>
+          <div class="key-row"><kbd>G</kbd><span class="key-desc">last line of file</span></div>
+          <div class="key-row"><kbd>50G</kbd><span class="key-desc">go to line 50</span></div>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 5 FILE JUMPS ──
+  {
+    title: 'File Jumps: gg G',
+    exercise: {
+      filename: 'bigfile.txt',
+      goal: 'Press <span class="hl">G</span> to reach the bottom, then <span class="hl">gg</span> to return to the top',
+      hint: 'G (capital) goes to the last line. gg (two lowercase g) goes to line 1.',
+      lines: [
+        '=== TOP — you start here. Press G to go to the bottom ===',
+        'Line 2', 'Line 3', 'Line 4', 'Line 5', 'Line 6',
+        'Line 7', 'Line 8', 'Line 9', 'Line 10', 'Line 11',
+        'Line 12', 'Line 13', 'Line 14', 'Line 15', 'Line 16',
+        '=== BOTTOM — now press gg to return to the top ===',
+      ],
+      check: s => s.visitedTop && s.visitedBottom,
+    },
+    render() {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>File Jumps: <span style="color:var(--orange)">gg &amp; G</span></h2>
+          <p class="slide-sub">Teleport through the file</p>
+          <div class="key-row"><kbd>g</kbd><kbd>g</kbd><span class="key-desc">jump to the <strong>first</strong> line of the file</span></div>
+          <div class="key-row"><kbd>G</kbd><span class="key-desc">jump to the <strong>last</strong> line of the file</span></div>
+          <div class="key-row"><kbd>50G</kbd><span class="key-desc">jump to line <strong>50</strong></span></div>
+          <div class="key-row"><kbd>Ctrl</kbd>+<kbd>d</kbd><span class="key-desc">scroll <strong>half page</strong> down</span></div>
+          <div class="key-row"><kbd>Ctrl</kbd>+<kbd>u</kbd><span class="key-desc">scroll <strong>half page</strong> up</span></div>
+          <p style="margin-top:0.9rem">In real Neovim, you'll often jump to a specific line via search (<kbd>/</kbd>) or LSP go-to-definition (<kbd>gd</kbd>) rather than manually typing a line number.</p>
+          <div class="callout"><strong>Note:</strong> <kbd>gg</kbd> is two lowercase g presses — distinct from <kbd>G</kbd> (Shift+g). The engine waits briefly for the second <kbd>g</kbd> after the first.</div>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 6 INSERT MODE ──
+  {
+    title: 'Insert Mode: i a o O',
+    exercise: {
+      filename: 'insert.txt',
+      goal: 'Type the word <span class="hl">hello</span> anywhere in the file',
+      hint: 'Press i to enter Insert mode, type "hello", then press Esc to return to Normal.',
+      lines: [
+        'Press i to insert before the cursor.',
+        'Press a to append after the cursor.',
+        'Press o to open a new line below and insert.',
+        'Press O to open a new line above and insert.',
+        '',
+        'Esc always returns you to Normal mode.',
+      ],
+      check: s => s.lines.some(l => l.toLowerCase().includes('hello')),
+    },
+    render() {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>Insert Mode: <span style="color:var(--green)">i a o O</span></h2>
+          <p class="slide-sub">There are four ways in — each places the cursor differently</p>
+          <div class="key-row"><kbd>i</kbd><span class="key-desc">insert <strong>before</strong> the cursor</span></div>
+          <div class="key-row"><kbd>a</kbd><span class="key-desc">append <strong>after</strong> the cursor</span></div>
+          <div class="key-row"><kbd>I</kbd><span class="key-desc">insert at <strong>start</strong> of line (first non-blank)</span></div>
+          <div class="key-row"><kbd>A</kbd><span class="key-desc">append at <strong>end</strong> of line</span></div>
+          <div class="key-row"><kbd>o</kbd><span class="key-desc">open new line <strong>below</strong>, enter insert</span></div>
+          <div class="key-row"><kbd>O</kbd><span class="key-desc">open new line <strong>above</strong>, enter insert</span></div>
+          <p style="margin-top:0.8rem">Once inside Insert mode, type normally. Backspace works. Enter creates new lines. Press <kbd>Esc</kbd> (or <kbd>Ctrl+[</kbd>) to leave.</p>
+          <div class="callout tip"><strong>Habit to build:</strong> Every Insert session should end with <kbd>Esc</kbd>. Never stay in Insert mode when you're done typing — Normal mode is home.</div>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 7 DELETE ──
+  {
+    title: 'Deleting: x dd',
+    exercise: {
+      filename: 'delete.txt',
+      goal: 'Delete <span class="hl">all</span> lines that say "DELETE THIS" using <kbd>dd</kbd>',
+      hint: 'Navigate to a "DELETE THIS" line with j/k, then press dd. Repeat for each.',
+      lines: [
+        'Keep this line.',
+        'DELETE THIS',
+        'Keep this line too.',
+        'DELETE THIS',
+        'This line stays.',
+        'DELETE THIS',
+        'Final keeper.',
+      ],
+      check: s => !s.lines.some(l => l.includes('DELETE THIS')),
+    },
+    render() {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>Deleting: <span style="color:var(--red)">x</span> and <span style="color:var(--red)">dd</span></h2>
+          <p class="slide-sub">Precise deletion without selecting first</p>
+          <div class="key-row"><kbd>x</kbd><span class="key-desc">delete the character <strong>under</strong> the cursor</span></div>
+          <div class="key-row"><kbd>d</kbd><kbd>d</kbd><span class="key-desc">delete the <strong>entire current line</strong></span></div>
+          <div class="key-row"><kbd>d</kbd><kbd>w</kbd><span class="key-desc">delete from cursor to <strong>next word</strong></span></div>
+          <div class="key-row"><kbd>d</kbd><kbd>$</kbd><span class="key-desc">delete to <strong>end of line</strong></span></div>
+          <div class="key-row"><kbd>3</kbd><kbd>d</kbd><kbd>d</kbd><span class="key-desc">delete <strong>3 lines</strong></span></div>
+          <p style="margin-top:0.8rem">Deleted text is automatically <strong>yanked</strong> (copied) into the default register. <kbd>p</kbd> pastes it back. This means <kbd>dd</kbd> + <kbd>p</kbd> elsewhere effectively moves a line.</p>
+          <div class="callout tip"><strong>From VS Code:</strong> <kbd>Ctrl+Shift+K</kbd> deleted a line. In Neovim that's just <kbd>dd</kbd> — no modifier needed because you're in Normal mode.</div>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 8 DOT ──
+  {
+    title: 'The Dot Command: .',
+    exercise: {
+      filename: 'dot.txt',
+      goal: 'Delete the first <span class="hl">REMOVE</span> line with <kbd>dd</kbd>, then use <kbd>.</kbd> to delete the others',
+      hint: 'After dd on the first REMOVE line, move to the next and press just . to repeat.',
+      lines: [
+        'Keep line A.',
+        'REMOVE — delete me with dd',
+        'Keep line B.',
+        'REMOVE — delete me with . (dot)',
+        'Keep line C.',
+        'REMOVE — delete me with . again',
+        'Keep line D.',
+      ],
+      check: s => !s.lines.some(l => l.includes('REMOVE')),
+    },
+    render() {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>The Dot Command: <span style="color:var(--orange)">.</span></h2>
+          <p class="slide-sub">Repeat your last change with one key</p>
+          <p><kbd>.</kbd> replays whatever you did last — a deletion, insertion, substitution, anything. This is one of Neovim's most powerful features.</p>
+          <div class="callout" style="margin:1rem 0"><strong>Example workflow:</strong><br>
+            1. <kbd>dd</kbd> — delete a line<br>
+            2. <kbd>j</kbd> — move to the next target<br>
+            3. <kbd>.</kbd> — delete that one too<br>
+            4. Repeat steps 2–3 as many times as needed
+          </div>
+          <p>This replaces a large chunk of what VS Code multi-cursor is used for. Instead of selecting all occurrences at once, you handle them one at a time — with full control at each step.</p>
+          <div class="callout tip"><strong>Key insight:</strong> The dot command remembers the <em>change</em>, not the <em>motion</em>. You move freely between uses of <kbd>.</kbd>.</div>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 9 YANK PASTE ──
+  {
+    title: 'Yank & Paste: yy p',
+    exercise: {
+      filename: 'paste.txt',
+      goal: 'Copy the <span class="hl">COPY ME</span> line with <kbd>yy</kbd> and paste a duplicate below it with <kbd>p</kbd>',
+      hint: 'Move to the COPY ME line, press yy to yank it, then press p to paste below.',
+      lines: [
+        'COPY ME — yank this line with yy',
+        '',
+        'Line 3',
+        'Line 4',
+        'Paste the copied line somewhere here',
+      ],
+      check: s => s.lines.filter(l => l.includes('COPY ME')).length >= 2,
+    },
+    render() {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>Yank &amp; Paste: <span style="color:var(--orange)">yy p P</span></h2>
+          <p class="slide-sub">Copy and paste without leaving the keyboard</p>
+          <div class="key-row"><kbd>y</kbd><kbd>y</kbd><span class="key-desc">yank (copy) the current line</span></div>
+          <div class="key-row"><kbd>p</kbd><span class="key-desc">paste <strong>below</strong> the current line</span></div>
+          <div class="key-row"><kbd>P</kbd><span class="key-desc">paste <strong>above</strong> the current line</span></div>
+          <div class="key-row"><kbd>y</kbd><kbd>w</kbd><span class="key-desc">yank a word</span></div>
+          <div class="key-row"><kbd>y</kbd><kbd>$</kbd><span class="key-desc">yank to end of line</span></div>
+          <p style="margin-top:0.8rem">Neovim stores yanked text in <strong>registers</strong>. The default register is reused by <kbd>p</kbd>. Deleted text also goes there, so <kbd>dd</kbd> followed by <kbd>p</kbd> moves a line.</p>
+          <div class="callout tip"><strong>System clipboard:</strong> In a real Neovim config, set <code>vim.opt.clipboard = 'unnamedplus'</code> so <kbd>yy</kbd>/<kbd>p</kbd> use the system clipboard — then <kbd>Ctrl+V</kbd> in other apps works as expected.</div>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 10 SEARCH ──
+  {
+    title: 'Searching: / n N',
+    exercise: {
+      filename: 'search.txt',
+      goal: 'Search for <span class="hl">needle</span> and press <kbd>n</kbd> at least 3 times',
+      hint: 'Type /needle then Enter to start the search, then press n to jump to each match.',
+      lines: [
+        'Searching is one of the most powerful Neovim features.',
+        'There is a needle hidden in this haystack of text.',
+        'Keep looking — another needle might appear further down.',
+        'Line after line of text to search through carefully.',
+        'Found another needle yet? Keep pressing n!',
+        'One more needle for good measure down here.',
+        'Use N to search backwards through the needles.',
+      ],
+      check: s => s.nPresses >= 3,
+    },
+    render() {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>Searching: <span style="color:var(--orange)">/ n N</span></h2>
+          <p class="slide-sub">Find anything in the file instantly</p>
+          <div class="key-row"><kbd>/</kbd><span class="key-desc">open search — type your pattern, press Enter</span></div>
+          <div class="key-row"><kbd>n</kbd><span class="key-desc">jump to the <strong>next</strong> match</span></div>
+          <div class="key-row"><kbd>N</kbd><span class="key-desc">jump to the <strong>previous</strong> match</span></div>
+          <div class="key-row"><kbd>?</kbd><span class="key-desc">search <strong>backwards</strong></span></div>
+          <p style="margin-top:0.8rem">Search wraps around the file. Patterns are regular expressions, so <kbd>/func.*name</kbd> matches any line with "func" followed by "name".</p>
+          <div class="callout tip"><strong>From VS Code:</strong> <kbd>Ctrl+F</kbd> in VS Code → <kbd>/</kbd> in Neovim. <kbd>Enter</kbd>/<kbd>F3</kbd> for next → <kbd>n</kbd> in Neovim.</div>
+          <p>For <strong>find and replace</strong>:</p>
+          <pre style="margin:0.5rem 0;font-size:0.8rem">:%s/old/new/g        replace all
+:%s/old/new/gc       confirm each</pre>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 11 UNDO ──
+  {
+    title: 'Undo & Redo: u Ctrl+r',
+    exercise: {
+      filename: 'undo.txt',
+      goal: 'Delete a line with <span class="hl">dd</span>, then undo it with <span class="hl">u</span>',
+      hint: 'Move to any line, press dd to delete it, then press u to undo the deletion.',
+      lines: [
+        'Practice undo here.',
+        'Delete this line with dd — then undo with u.',
+        'And this one: delete with dd, then u to restore it.',
+        'The undo history is unlimited during the session.',
+      ],
+      check: s => s.undoCount >= 1,
+    },
+    render() {
+      return `<div class="slide-split">
+        <div class="slide-explain">
+          <h2>Undo &amp; Redo: <span style="color:var(--orange)">u</span> and <span style="color:var(--orange)">Ctrl+r</span></h2>
+          <p class="slide-sub">Nothing is ever truly gone</p>
+          <div class="key-row"><kbd>u</kbd><span class="key-desc">undo the last change</span></div>
+          <div class="key-row"><kbd>Ctrl</kbd>+<kbd>r</kbd><span class="key-desc">redo (un-undo)</span></div>
+          <div class="key-row"><kbd>5u</kbd><span class="key-desc">undo the last 5 changes</span></div>
+          <p style="margin-top:0.8rem">Neovim's undo history is a <strong>tree</strong>, not a linear stack. If you undo three changes and then make a new one, the undone branch is still accessible via <code>:undolist</code>. You cannot permanently lose work.</p>
+          <p>Neovim can also persist undo history across sessions — add this to your config:</p>
+          <pre style="font-size:0.8rem;margin:0.5rem 0">vim.opt.undofile = true</pre>
+          <div class="callout tip"><strong>From VS Code:</strong> <kbd>Ctrl+Z</kbd> → <kbd>u</kbd>. <kbd>Ctrl+Y</kbd> / <kbd>Ctrl+Shift+Z</kbd> → <kbd>Ctrl+r</kbd>. Same concept, different keys.</div>
+        </div>
+        <div class="slide-exercise" id="ex-area"></div>
+      </div>`;
+    },
+  },
+
+  // ── 12 DONE ──
+  {
+    title: "You're Ready",
+    render() {
+      return `<div class="slide-center"><div class="slide-center-inner">
+        <h1>You know the <span style="color:var(--green)">fundamentals</span>.</h1>
+        <p class="big-sub">hjkl · w b e · 0 $ gg G · i a o · dd yy p · / n · u — that's the core 90% of daily navigation.</p>
+        <div class="callout tip" style="margin-bottom:1.5rem"><strong>What's next:</strong> Use Neovim for real work. Expect to be slow for a week or two. Every time you reach for the mouse or arrow keys, stop and find the keyboard equivalent. It compounds fast.</div>
+        <p style="color:var(--fg2);font-size:0.9rem;margin-bottom:0.8rem">Keep learning with the rest of this guide:</p>
+        <div class="tut-link-grid">
+          <a class="tut-link-card" href="index.html">
+            <div class="tlc-title">Basics</div>
+            <div class="tlc-desc">Full reference for modes, motions, and operators</div>
+          </a>
+          <a class="tut-link-card" href="advanced.html">
+            <div class="tlc-title">Advanced</div>
+            <div class="tlc-desc">Macros, registers, marks, text objects, folds</div>
+          </a>
+          <a class="tut-link-card" href="cheatsheet.html">
+            <div class="tlc-title">Cheatsheet</div>
+            <div class="tlc-desc">Print-friendly quick reference card</div>
+          </a>
+          <a class="tut-link-card" href="practice.html">
+            <div class="tlc-title">Practice ↗</div>
+            <div class="tlc-desc">13 interactive exercises with a full vim emulator</div>
+          </a>
+          <a class="tut-link-card" href="vscode-to-nvim.html">
+            <div class="tlc-title">VS Code → Nvim</div>
+            <div class="tlc-desc">Full shortcut mapping & plugin equivalents</div>
+          </a>
+        </div>
+      </div></div>`;
+    },
+  },
+];
+
+// ─────────────────────────────────────────────
+// SLIDESHOW CONTROLLER
+// ─────────────────────────────────────────────
+
+let current = 0;
+let completed = new Set();
+let engine = null;
+let renderFn = null;
+
+const mainEl   = document.getElementById('tut-main');
+const dotsEl   = document.getElementById('tut-dots');
+const counterEl = document.getElementById('tut-counter');
+const titleBarEl = document.getElementById('tut-title-bar');
+const prevBtn  = document.getElementById('prev-btn');
+const nextBtn  = document.getElementById('next-btn');
+const hintBtn  = document.getElementById('hint-btn');
+
+function buildDots() {
+  dotsEl.innerHTML = SLIDES.map((s, i) =>
+    `<div class="tut-dot${i === current ? ' active' : ''}${completed.has(i) ? ' done' : ''}" data-i="${i}" title="${s.title}"></div>`
+  ).join('');
+  dotsEl.querySelectorAll('.tut-dot').forEach(d => {
+    d.addEventListener('click', () => goTo(parseInt(d.dataset.i)));
+  });
+}
+
+function resolveKey(e) {
+  if (e.ctrlKey) return 'C-' + e.key.toLowerCase();
+  if (e.key === 'Escape')    return 'Esc';
+  if (e.key === 'Enter')     return 'CR';
+  if (e.key === 'Backspace') return 'BS';
+  if (e.key === 'ArrowLeft') return 'h';
+  if (e.key === 'ArrowRight')return 'l';
+  if (e.key === 'ArrowUp')   return 'k';
+  if (e.key === 'ArrowDown') return 'j';
+  return e.key;
+}
+
+function mountExercise(slide) {
+  const ex = slide.exercise;
+  engine = new VimEngine(ex.lines);
+
+  const exArea = document.getElementById('ex-area');
+  exArea.innerHTML = `
+    <div class="mini-editor" tabindex="0" id="mini-ed">
+      <div class="click-to-start">Click here to start typing</div>
+      <div class="mini-editor-topbar">
+        <span class="mini-editor-filename">${ex.filename}</span>
+        <span style="font-size:0.72rem;color:var(--fg3)">click to focus</span>
+      </div>
+      <div class="mini-editor-lines" id="mini-lines"></div>
+      <div class="mini-statusline" id="mini-status">
+        <span class="ms-mode">NORMAL</span>
+        <span class="ms-pos">1:1</span>
+      </div>
+      <div class="mini-cmdline" id="mini-cmd"></div>
+    </div>
+    <div class="goal-strip" id="goal-strip">
+      <div class="gs-label">Exercise</div>
+      <div class="gs-text">${ex.goal}</div>
+      <div class="gs-complete">✓ Complete! Press Next → to continue</div>
+    </div>`;
+
+  const edEl    = document.getElementById('mini-ed');
+  const linesEl = document.getElementById('mini-lines');
+  const statusEl = document.getElementById('mini-status');
+  const cmdEl   = document.getElementById('mini-cmd');
+  const goalEl  = document.getElementById('goal-strip');
+
+  function doRender() {
+    renderEngine(engine, linesEl, statusEl, cmdEl);
+    if (ex.check(engine)) {
+      goalEl.classList.add('complete');
+      completed.add(current);
+      buildDots();
+    }
+  }
+
+  edEl.addEventListener('keydown', e => {
+    // block arrow keys from bubbling to slide nav when editor focused
+    if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)) e.stopPropagation();
+    if (e.metaKey) return;
+    if (e.ctrlKey && !['r','u','d','['].includes(e.key.toLowerCase())) return;
+    e.preventDefault();
+    engine.handleKey(resolveKey(e));
+    doRender();
+  });
+
+  doRender();
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= SLIDES.length) return;
+  current = idx;
+  const slide = SLIDES[idx];
+
+  // render slide HTML
+  mainEl.innerHTML = slide.render ? slide.render() : '';
+
+  // mount exercise if present
+  if (slide.exercise) {
+    mountExercise(slide);
+    hintBtn.style.display = '';
+    hintBtn.onclick = () => {
+      const g = document.getElementById('goal-strip');
+      if (g) {
+        const t = g.querySelector('.gs-text');
+        if (t) t.innerHTML = slide.exercise.goal + ' &nbsp;<span style="color:var(--yellow)">Hint: ' + slide.exercise.hint + '</span>';
+      }
+    };
+  } else {
+    hintBtn.style.display = 'none';
+  }
+
+  prevBtn.disabled = idx === 0;
+  nextBtn.textContent = idx === SLIDES.length - 1 ? 'Finish' : 'Next →';
+  nextBtn.classList.toggle('primary', true);
+
+  counterEl.textContent = `${idx + 1} / ${SLIDES.length}`;
+  titleBarEl.textContent = slide.title;
+  buildDots();
+}
+
+prevBtn.addEventListener('click', () => goTo(current - 1));
+nextBtn.addEventListener('click', () => {
+  if (current === SLIDES.length - 1) window.location.href = 'practice.html';
+  else goTo(current + 1);
+});
+
+// keyboard slide navigation (only when editor not focused)
+document.addEventListener('keydown', e => {
+  if (document.activeElement && document.activeElement.id === 'mini-ed') return;
+  if (e.key === 'ArrowRight' || e.key === 'l') { e.preventDefault(); goTo(current + 1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'h') { e.preventDefault(); goTo(current - 1); }
+});
+
+// init
+goTo(0);
+</script>
+</body>
+</html>
