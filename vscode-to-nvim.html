@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Guide — VS Code to Neovim</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+    }
+    .step-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.4rem;
+      position: relative;
+    }
+    .step-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--bg4);
+      position: absolute;
+      top: 0.8rem;
+      right: 1rem;
+      line-height: 1;
+      user-select: none;
+    }
+    .step-card h3 {
+      color: var(--teal);
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+    .step-card p, .step-card li {
+      color: var(--fg2);
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+    .step-card ul {
+      padding-left: 1.1rem;
+      margin-top: 0.4rem;
+    }
+    .vsc-nvim-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+    .vsc-nvim-table th {
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid var(--border);
+    }
+    .vsc-nvim-table th.vsc-col { color: var(--accent2); }
+    .vsc-nvim-table th.nvim-col { color: var(--accent); }
+    .vsc-nvim-table th.action-col { color: var(--fg3); }
+    .vsc-nvim-table td {
+      padding: 0.55rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+    .vsc-nvim-table tr:hover td { background: var(--bg3); }
+    .vsc-nvim-table td.action { color: var(--fg2); font-size: 0.82rem; }
+    .vsc-nvim-table td.note { color: var(--fg3); font-size: 0.78rem; font-style: italic; }
+    .plugin-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .plugin-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+    .plugin-card .plugin-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+    .plugin-card.vsc .plugin-label { color: var(--accent2); }
+    .plugin-card.nvim .plugin-label { color: var(--accent); }
+    .plugin-card h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--fg);
+    }
+    .plugin-card p {
+      color: var(--fg2);
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .roadmap-week {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+    .roadmap-week .week-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg3);
+      margin-bottom: 0.3rem;
+    }
+    .roadmap-week h4 {
+      color: var(--accent);
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 0.7rem;
+    }
+    .roadmap-week ul {
+      padding-left: 1rem;
+      color: var(--fg2);
+      font-size: 0.8rem;
+      line-height: 1.8;
+    }
+    .mode-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0;
+    }
+    .mode-box {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem 1.2rem;
+      text-align: center;
+      min-width: 110px;
+    }
+    .mode-box .mode-name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.3rem;
+    }
+    .mode-box .mode-key {
+      font-size: 0.78rem;
+      color: var(--fg3);
+    }
+    .mode-box.normal .mode-name { color: var(--accent); }
+    .mode-box.insert .mode-name { color: var(--green); }
+    .mode-box.visual .mode-name { color: var(--accent2); }
+    .mode-box.command .mode-name { color: var(--yellow); }
+    .arrow {
+      color: var(--fg3);
+      font-size: 1.1rem;
+    }
+    @media (max-width: 900px) {
+      .roadmap { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 700px) {
+      .roadmap { grid-template-columns: 1fr; }
+      .plugin-row { grid-template-columns: 1fr; }
+    }
+    .tut-section {
+      margin-bottom: 3.5rem;
+    }
+    .tut-section h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--fg);
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="index.html">Basics</a></li>
+    <li><a href="advanced.html">Advanced</a></li>
+    <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="vscode-to-nvim.html" class="active">VS Code → Nvim</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+    <li><a href="practice.html">Practice</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <h1>VS Code → Neovim</h1>
+    <p>A practical migration guide for developers coming from Visual Studio Code.</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- WHY -->
+  <div class="tut-section">
+    <h2>&#128161; Why Switch?</h2>
+    <div class="callout">
+      <strong>Honest take:</strong> Neovim is not for everyone. VS Code is an excellent editor. Switch if you want speed, composability, and full control over your environment — not just because it looks cool.
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title" style="color:var(--green);">What you gain</div>
+        <ul style="padding-left:1.1rem;color:var(--fg2);font-size:0.85rem;line-height:1.9;">
+          <li>Editing speed — less mouse, more intent</li>
+          <li>Composable commands (<code>d3w</code>, <code>ci"</code>, <code>yap</code>)</li>
+          <li>Runs everywhere — SSH, containers, servers</li>
+          <li>Infinitely configurable in Lua</li>
+          <li>Near-zero UI overhead, instant startup</li>
+          <li>Keyboard-driven everything</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--orange);">What you give up (temporarily)</div>
+        <ul style="padding-left:1.1rem;color:var(--fg2);font-size:0.85rem;line-height:1.9;">
+          <li>Immediate productivity — expect 2–4 weeks of slowdown</li>
+          <li>Point-and-click discoverability</li>
+          <li>Some VS Code extensions have no nvim equivalent</li>
+          <li>Easy per-project settings UI</li>
+          <li>Built-in Jupyter notebook support</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--teal);">The good news</div>
+        <p class="key-desc">Almost every VS Code feature has a Neovim equivalent — LSP, debugging, Git, file explorer, fuzzy finding, auto-completion, themes. It just requires intentional configuration rather than a GUI marketplace.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MENTAL MODEL -->
+  <div class="tut-section">
+    <h2>&#129504; The Mental Model Shift</h2>
+    <p class="key-desc" style="margin-bottom:1rem;">The biggest hurdle is not learning shortcuts — it is understanding <strong style="color:var(--fg);">modal editing</strong>. VS Code is always in "insert mode." Neovim is not.</p>
+
+    <div class="mode-diagram">
+      <div class="mode-box normal">
+        <div class="mode-name">Normal</div>
+        <div class="mode-key">default</div>
+      </div>
+      <div class="arrow">&#8594;</div>
+      <div class="mode-box insert">
+        <div class="mode-name">Insert</div>
+        <div class="mode-key">i / a / o</div>
+      </div>
+      <div class="arrow">&#8594;</div>
+      <div class="mode-box normal">
+        <div class="mode-name">Normal</div>
+        <div class="mode-key">Esc</div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <strong>Key insight:</strong> In VS Code you stay in insert mode and use modifier keys (<kbd>Ctrl</kbd>, <kbd>Alt</kbd>) to trigger actions. In Neovim you <em>leave</em> insert mode to navigate and operate, then re-enter to type. Normal mode is home base, not a detour.
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">Think in verbs + nouns</div>
+        <p class="key-desc">Neovim commands compose like a language:</p>
+        <table class="key-table" style="margin-top:0.8rem;">
+          <tr><td><kbd>d</kbd><kbd>w</kbd></td><td class="key-desc"><strong>d</strong>elete <strong>w</strong>ord</td></tr>
+          <tr><td><kbd>c</kbd><kbd>i</kbd><kbd>"</kbd></td><td class="key-desc"><strong>c</strong>hange <strong>i</strong>nside <strong>"</strong></td></tr>
+          <tr><td><kbd>y</kbd><kbd>a</kbd><kbd>p</kbd></td><td class="key-desc"><strong>y</strong>ank <strong>a</strong>round <strong>p</strong>aragraph</td></tr>
+          <tr><td><kbd>></kbd><kbd>i</kbd><kbd>{</kbd></td><td class="key-desc">indent inside <strong>{</strong></td></tr>
+          <tr><td><kbd>3</kbd><kbd>d</kbd><kbd>j</kbd></td><td class="key-desc">delete 3 lines down</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">The dot command</div>
+        <p class="key-desc"><kbd>.</kbd> repeats your last change. This replaces a huge amount of what VS Code multi-cursor is used for.</p>
+        <pre><code>-- Change first occurrence manually,
+-- then move to next with n or f,
+-- then press . to repeat the change.</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-title">Normal mode is not "idle"</div>
+        <p class="key-desc">You spend most time in Normal mode, actively navigating, copying, deleting, and transforming text — without typing new characters. It feels slow at first; it becomes faster than any GUI workflow.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SURVIVAL GUIDE -->
+  <div class="tut-section">
+    <h2>&#128737; Survival Guide — First Day</h2>
+    <p class="key-desc" style="margin-bottom:1.2rem;">Know these before you open a real file in Neovim.</p>
+    <div class="step-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3>How to quit</h3>
+        <p>Press <kbd>Esc</kbd> to ensure you are in Normal mode, then type <kbd>:</kbd><kbd>q</kbd><kbd>!</kbd> and hit Enter to quit without saving, or <kbd>:</kbd><kbd>w</kbd><kbd>q</kbd> to save and quit.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3>How to type text</h3>
+        <p>Press <kbd>i</kbd> to enter Insert mode — the status line will say <span class="mode-badge mode-insert">INSERT</span>. Type normally. Press <kbd>Esc</kbd> to go back to Normal mode.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3>How to undo / redo</h3>
+        <p><kbd>u</kbd> undoes in Normal mode. <kbd>Ctrl</kbd>+<kbd>r</kbd> redoes. No <kbd>Ctrl+Z</kbd> needed. The undo history is a tree — nothing is ever truly lost.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h3>How to save</h3>
+        <p><kbd>:</kbd><kbd>w</kbd> + Enter writes the file. Many configs map <kbd>Ctrl</kbd>+<kbd>s</kbd> to <code>:w</code> for muscle-memory comfort during the transition.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">5</div>
+        <h3>How to move</h3>
+        <p>Arrow keys work. Once comfortable, use <kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd> for left/down/up/right. Add <kbd>w</kbd>/<kbd>b</kbd> for word jumps, <kbd>0</kbd>/<kbd>$</kbd> for line start/end.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">6</div>
+        <h3>When you get stuck</h3>
+        <p>Press <kbd>Esc</kbd> repeatedly until the mode indicator shows Normal. Then type <kbd>:</kbd> and use the command line. <kbd>:help keyword</kbd> opens the built-in manual.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MUSCLE MEMORY MAP -->
+  <div class="tut-section">
+    <h2>&#9000; Muscle Memory Map</h2>
+    <p class="key-desc" style="margin-bottom:1.2rem;">Direct translation of your VS Code shortcuts. <em>Plugin required</em> means you need a plugin from the recommended setup below.</p>
+
+    <table class="vsc-nvim-table">
+      <thead>
+        <tr>
+          <th class="action-col">Action</th>
+          <th class="vsc-col">VS Code</th>
+          <th class="nvim-col">Neovim</th>
+          <th class="action-col">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="action">Open file (fuzzy)</td>
+          <td><kbd>Ctrl</kbd>+<kbd>P</kbd></td>
+          <td><kbd>&lt;leader&gt;</kbd><kbd>f</kbd><kbd>f</kbd></td>
+          <td class="note">Telescope plugin; leader is often Space</td>
+        </tr>
+        <tr>
+          <td class="action">Command palette</td>
+          <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></td>
+          <td><kbd>:</kbd> (command line)</td>
+          <td class="note">All commands are typed; use Tab to autocomplete</td>
+        </tr>
+        <tr>
+          <td class="action">Search in file</td>
+          <td><kbd>Ctrl</kbd>+<kbd>F</kbd></td>
+          <td><kbd>/</kbd> then pattern</td>
+          <td class="note"><kbd>n</kbd>/<kbd>N</kbd> for next/prev; regex supported</td>
+        </tr>
+        <tr>
+          <td class="action">Search across files</td>
+          <td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd></td>
+          <td><kbd>&lt;leader&gt;</kbd><kbd>f</kbd><kbd>g</kbd></td>
+          <td class="note">Telescope live_grep; uses ripgrep</td>
+        </tr>
+        <tr>
+          <td class="action">Find and replace</td>
+          <td><kbd>Ctrl</kbd>+<kbd>H</kbd></td>
+          <td><kbd>:</kbd><code>%s/old/new/gc</code></td>
+          <td class="note"><code>g</code>=all occurrences, <code>c</code>=confirm each</td>
+        </tr>
+        <tr>
+          <td class="action">Go to definition</td>
+          <td><kbd>F12</kbd></td>
+          <td><kbd>g</kbd><kbd>d</kbd></td>
+          <td class="note">Requires LSP attached</td>
+        </tr>
+        <tr>
+          <td class="action">Peek / hover docs</td>
+          <td><kbd>Ctrl</kbd>+<kbd>K</kbd> <kbd>Ctrl</kbd>+<kbd>I</kbd></td>
+          <td><kbd>K</kbd></td>
+          <td class="note">Requires LSP; opens floating window</td>
+        </tr>
+        <tr>
+          <td class="action">Rename symbol</td>
+          <td><kbd>F2</kbd></td>
+          <td><kbd>&lt;leader&gt;</kbd><kbd>r</kbd><kbd>n</kbd></td>
+          <td class="note">LSP rename; updates all references</td>
+        </tr>
+        <tr>
+          <td class="action">Code action / quick fix</td>
+          <td><kbd>Ctrl</kbd>+<kbd>.</kbd></td>
+          <td><kbd>&lt;leader&gt;</kbd><kbd>c</kbd><kbd>a</kbd></td>
+          <td class="note">LSP code action</td>
+        </tr>
+        <tr>
+          <td class="action">Format document</td>
+          <td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>F</kbd></td>
+          <td><kbd>&lt;leader&gt;</kbd><kbd>f</kbd></td>
+          <td class="note">LSP format; or conform.nvim</td>
+        </tr>
+        <tr>
+          <td class="action">Toggle file explorer</td>
+          <td><kbd>Ctrl</kbd>+<kbd>B</kbd></td>
+          <td><kbd>&lt;leader&gt;</kbd><kbd>e</kbd></td>
+          <td class="note">nvim-tree or neo-tree plugin</td>
+        </tr>
+        <tr>
+          <td class="action">Split editor right</td>
+          <td><kbd>Ctrl</kbd>+<kbd>\</kbd></td>
+          <td><kbd>:</kbd><code>vsp</code> or <kbd>Ctrl</kbd>+<kbd>w</kbd><kbd>v</kbd></td>
+          <td class="note">Navigate splits with Ctrl+w + hjkl</td>
+        </tr>
+        <tr>
+          <td class="action">Toggle terminal</td>
+          <td><kbd>Ctrl</kbd>+<kbd>`</kbd></td>
+          <td><kbd>&lt;leader&gt;</kbd><kbd>t</kbd> or <kbd>:</kbd><code>term</code></td>
+          <td class="note">toggleterm.nvim for VS Code-like UX</td>
+        </tr>
+        <tr>
+          <td class="action">Close tab / buffer</td>
+          <td><kbd>Ctrl</kbd>+<kbd>W</kbd></td>
+          <td><kbd>:</kbd><code>bd</code> or <kbd>&lt;leader&gt;</kbd><kbd>x</kbd></td>
+          <td class="note">Neovim has buffers, not tabs</td>
+        </tr>
+        <tr>
+          <td class="action">Switch between open files</td>
+          <td><kbd>Ctrl</kbd>+<kbd>Tab</kbd></td>
+          <td><kbd>&lt;leader&gt;</kbd><kbd>f</kbd><kbd>b</kbd></td>
+          <td class="note">Telescope buffers; or :bnext / :bprev</td>
+        </tr>
+        <tr>
+          <td class="action">Multi-cursor select word</td>
+          <td><kbd>Ctrl</kbd>+<kbd>D</kbd></td>
+          <td><kbd>*</kbd> then <kbd>cgn</kbd></td>
+          <td class="note">Search word, change, then <kbd>.</kbd> to repeat</td>
+        </tr>
+        <tr>
+          <td class="action">Comment line</td>
+          <td><kbd>Ctrl</kbd>+<kbd>/</kbd></td>
+          <td><kbd>g</kbd><kbd>c</kbd><kbd>c</kbd></td>
+          <td class="note">Comment.nvim; <kbd>gc</kbd>+motion for range</td>
+        </tr>
+        <tr>
+          <td class="action">Copy line up/down</td>
+          <td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>↑/↓</kbd></td>
+          <td><kbd>y</kbd><kbd>y</kbd><kbd>p</kbd> / <kbd>y</kbd><kbd>y</kbd><kbd>P</kbd></td>
+          <td class="note">Yank line, paste below/above</td>
+        </tr>
+        <tr>
+          <td class="action">Move line up/down</td>
+          <td><kbd>Alt</kbd>+<kbd>↑/↓</kbd></td>
+          <td><kbd>:m .+1</kbd> / <kbd>:m .-2</kbd></td>
+          <td class="note">Map to Alt+j/k in your config</td>
+        </tr>
+        <tr>
+          <td class="action">Git diff / source control</td>
+          <td>Source Control panel</td>
+          <td><kbd>&lt;leader&gt;</kbd><kbd>g</kbd><kbd>g</kbd></td>
+          <td class="note">Lazygit or fugitive.vim</td>
+        </tr>
+        <tr>
+          <td class="action">Inline git blame</td>
+          <td>GitLens extension</td>
+          <td>virtual text via gitsigns.nvim</td>
+          <td class="note">Appears automatically on current line</td>
+        </tr>
+        <tr>
+          <td class="action">Indent / outdent</td>
+          <td><kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd></td>
+          <td><kbd>></kbd><kbd>></kbd> / <kbd>&lt;</kbd><kbd>&lt;</kbd></td>
+          <td class="note">In Normal mode; <kbd>></kbd> in Visual for selection</td>
+        </tr>
+        <tr>
+          <td class="action">Select all</td>
+          <td><kbd>Ctrl</kbd>+<kbd>A</kbd></td>
+          <td><kbd>g</kbd><kbd>g</kbd><kbd>V</kbd><kbd>G</kbd></td>
+          <td class="note">Go to top, visual line, go to bottom</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FIRST CONFIG -->
+  <div class="tut-section">
+    <h2>&#128640; Your First Config — kickstart.nvim</h2>
+    <p class="key-desc" style="margin-bottom:1rem;">Don't build a config from scratch on day one. Start with <strong style="color:var(--fg);">kickstart.nvim</strong> — a single-file, well-commented config that sets up LSP, Telescope, Treesitter, and sensible defaults.</p>
+    <div class="callout tip">
+      <strong>Recommended:</strong> <code>github.com/nvim-lua/kickstart.nvim</code> — clone it, read every line, and modify from there. It is intentionally small and educational.
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">Install</div>
+        <pre><code># Back up any existing config
+mv ~/.config/nvim ~/.config/nvim.bak
+
+# Clone kickstart
+git clone https://github.com/nvim-lua/kickstart.nvim \
+  ~/.config/nvim</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-title">First launch</div>
+        <pre><code>nvim</code></pre>
+        <p class="key-desc" style="margin-top:0.6rem;">lazy.nvim will install all plugins automatically. Wait for it to finish, then restart Neovim.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Add a language server</div>
+        <pre><code>-- In init.lua, find the servers table:
+servers = {
+  -- Add your languages:
+  pyright = {},        -- Python
+  ts_ls = {},          -- TypeScript
+  rust_analyzer = {},  -- Rust
+}</code></pre>
+        <p class="key-desc" style="margin-top:0.6rem;">mason.nvim (included) installs the LSP binaries automatically.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLUGIN EQUIVALENTS -->
+  <div class="tut-section">
+    <h2>&#128268; VS Code Extension Equivalents</h2>
+    <p class="key-desc" style="margin-bottom:1.5rem;">Every feature you relied on in VS Code has a Neovim counterpart.</p>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>IntelliSense (language features)</h4>
+        <p>Built-in via language-specific extensions (Pylance, Volar, etc.)</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>nvim-lspconfig + mason.nvim</h4>
+        <p>Configures the built-in LSP client. mason.nvim installs the same language servers VS Code uses.</p>
+      </div>
+    </div>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>IntelliSense autocomplete dropdown</h4>
+        <p>Built-in completion UI from the language extension.</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>nvim-cmp + luasnip</h4>
+        <p>Completion engine that aggregates LSP, snippets, buffer words, and path completions into one popup.</p>
+      </div>
+    </div>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>Quick Open / Go to File (<kbd>Ctrl+P</kbd>)</h4>
+        <p>Fuzzy file finder built-in.</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>telescope.nvim</h4>
+        <p>Fuzzy finder for files, buffers, grep, LSP symbols, git commits, help pages, and more. Highly extensible.</p>
+      </div>
+    </div>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>Explorer sidebar</h4>
+        <p>Tree-view file browser with drag-and-drop.</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>nvim-tree.lua or neo-tree.nvim</h4>
+        <p>Keyboard-driven file tree. neo-tree also shows git status and buffer list in the same sidebar.</p>
+      </div>
+    </div>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>GitLens</h4>
+        <p>Inline blame, hunk staging, git history per line.</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>gitsigns.nvim + lazygit / vim-fugitive</h4>
+        <p>gitsigns handles inline blame and hunk navigation. lazygit (in a float) or fugitive covers staging, commits, and history.</p>
+      </div>
+    </div>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>Integrated terminal</h4>
+        <p>Panel at the bottom, multiple terminals via tabs.</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>toggleterm.nvim</h4>
+        <p>Floating or split terminal that toggles with a keybind. Supports multiple named terminals.</p>
+      </div>
+    </div>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>Error Lens / Problems panel</h4>
+        <p>Inline error/warning text next to the offending line.</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>Built-in vim.diagnostic + trouble.nvim</h4>
+        <p>Neovim shows virtual text inline by default. trouble.nvim gives you a VS Code-style Problems panel.</p>
+      </div>
+    </div>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>Prettier / formatters</h4>
+        <p>Format-on-save via extension settings.</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>conform.nvim</h4>
+        <p>Runs any formatter (prettier, black, stylua, gofmt) on save. Configured per filetype in Lua.</p>
+      </div>
+    </div>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>Bracket pair colorizer</h4>
+        <p>Colors matching brackets in different colours.</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>Built-in (0.9+)</h4>
+        <p><code>vim.opt.termguicolors = true</code> and Neovim 0.9+ have native rainbow bracket highlighting via Treesitter.</p>
+      </div>
+    </div>
+
+    <div class="plugin-row">
+      <div class="plugin-card vsc">
+        <div class="plugin-label">VS Code</div>
+        <h4>Auto Rename Tag</h4>
+        <p>Renames closing HTML/JSX tag when you edit the opening tag.</p>
+      </div>
+      <div class="plugin-card nvim">
+        <div class="plugin-label">Neovim</div>
+        <h4>nvim-ts-autotag</h4>
+        <p>Treesitter-powered — accurately handles nested and self-closing tags.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 30-DAY ROADMAP -->
+  <div class="tut-section">
+    <h2>&#128197; 30-Day Roadmap</h2>
+    <p class="key-desc" style="margin-bottom:1.2rem;">A realistic pace for building Neovim fluency without burning out.</p>
+    <div class="roadmap">
+      <div class="roadmap-week">
+        <div class="week-label">Week 1</div>
+        <h4>Survive</h4>
+        <ul>
+          <li>Open, edit, save, quit</li>
+          <li>Normal / Insert / Visual modes</li>
+          <li>Basic motions: hjkl, w/b, 0/$</li>
+          <li>Undo / redo</li>
+          <li>Search with /</li>
+          <li>Use vimtutor daily</li>
+        </ul>
+      </div>
+      <div class="roadmap-week">
+        <div class="week-label">Week 2</div>
+        <h4>Edit faster</h4>
+        <ul>
+          <li>Operators: d, c, y, ></li>
+          <li>Text objects: iw, i", a{</li>
+          <li>The dot command (.)</li>
+          <li>f/t/F/T for in-line jumps</li>
+          <li>Visual selection + operators</li>
+          <li>Macros (q to record)</li>
+        </ul>
+      </div>
+      <div class="roadmap-week">
+        <div class="week-label">Week 3</div>
+        <h4>IDE features</h4>
+        <ul>
+          <li>LSP: gd, K, gr, &lt;leader&gt;rn</li>
+          <li>Telescope: files, grep, buffers</li>
+          <li>Completion with nvim-cmp</li>
+          <li>Git workflow with gitsigns</li>
+          <li>File tree navigation</li>
+          <li>Split windows</li>
+        </ul>
+      </div>
+      <div class="roadmap-week">
+        <div class="week-label">Week 4</div>
+        <h4>Make it yours</h4>
+        <ul>
+          <li>Customize keymaps</li>
+          <li>Add language servers</li>
+          <li>Configure formatters</li>
+          <li>Explore the plugin ecosystem</li>
+          <li>Read :help for things you use</li>
+          <li>Ditch the mouse entirely</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Tip:</strong> Use Neovim for all new work but keep VS Code available. Forcing yourself through frustration on a deadline is counterproductive. Over time you will reach for VS Code less and less.
+    </div>
+  </div>
+
+  <!-- COMMON GOTCHAS -->
+  <div class="tut-section">
+    <h2>&#9888; Common Gotchas</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title" style="color:var(--yellow);">"I accidentally typed :wq in insert mode"</div>
+        <p class="key-desc">You were in Normal mode without knowing it. Always watch the mode indicator in the status line. Press <kbd>Esc</kbd> intentionally before every command.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--yellow);">"My paste is indented weirdly"</div>
+        <p class="key-desc">Set <code>vim.opt.clipboard = 'unnamedplus'</code> to sync with the system clipboard, and install <code>xclip</code> or <code>wl-clipboard</code> on Linux. Kickstart does this for you.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--yellow);">"LSP is not working"</div>
+        <p class="key-desc">Run <kbd>:</kbd><code>LspInfo</code> to see which servers are attached. Run <kbd>:</kbd><code>Mason</code> to install missing servers. Make sure the project has a root marker (package.json, pyproject.toml, etc.).</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--yellow);">"Colours look wrong"</div>
+        <p class="key-desc">Your terminal must support true colour. Add <code>export TERM=xterm-256color</code> or better, use a terminal that sets <code>COLORTERM=truecolor</code> (Kitty, Alacritty, WezTerm, iTerm2).</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--yellow);">"I can't find the settings UI"</div>
+        <p class="key-desc">There is no settings UI. All configuration is in <code>~/.config/nvim/init.lua</code>. Open it with <kbd>:</kbd><code>e $MYVIMRC</code> from anywhere.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--yellow);">"Ctrl+C doesn't copy"</div>
+        <p class="key-desc">In Normal/Visual mode, Neovim uses its own registers. <kbd>y</kbd> yanks, <kbd>p</kbd> pastes. For system clipboard interop, prefix with <kbd>"</kbd><kbd>+</kbd>: <kbd>"</kbd><kbd>+</kbd><kbd>y</kbd> / <kbd>"</kbd><kbd>+</kbd><kbd>p</kbd>. Or set unnamedplus (see above).</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Neovim Guide &mdash; <a href="https://neovim.io" target="_blank">neovim.io</a> &mdash; <a href="practice.html">Practice Now</a></p>
+</footer>
+
+</body>
+</html>
