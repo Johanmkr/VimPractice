@@ -3,15 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neovim Guide — Navigation & Basics</title>
+  <title>NVIM Guide — Learn Neovim</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .home-hero {
+      text-align: center;
+      padding: 5rem 2rem 2rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .home-hero .logo-mark {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--fg3);
+      margin-bottom: 1.2rem;
+    }
+    .home-hero h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 1.2rem;
+    }
+    .home-hero p {
+      color: var(--fg2);
+      font-size: 1rem;
+      max-width: 520px;
+      margin: 0 auto 2rem;
+      line-height: 1.7;
+    }
+    .home-divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      max-width: 900px;
+      margin: 0 auto 0.5rem;
+      padding: 0 2rem;
+      color: var(--fg3);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .home-divider::before,
+    .home-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+  </style>
 </head>
 <body>
 
 <nav>
   <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
   <ul>
-    <li><a href="index.html" class="active">Basics</a></li>
+    <li><a href="basics.html">Basics</a></li>
     <li><a href="advanced.html">Advanced</a></li>
     <li><a href="vs-vim.html">Vim vs Neovim</a></li>
     <li><a href="vscode-to-nvim.html">VS Code → Nvim</a></li>
@@ -21,217 +69,134 @@
   </ul>
 </nav>
 
-<div class="hero">
-  <h1><span class="hl-accent">Navigate</span> Neovim<br>like a <span class="hl-green">pro</span></h1>
-  <p>Learn the fundamentals of Neovim — modes, motions, operators, and commands — then put them to practice in the interactive editor.</p>
+<div class="home-hero">
+  <div class="logo-mark">&#9632; NVIM Guide</div>
+  <h1>
+    Master <span class="hl-accent">Neovim</span><br>
+    one keystroke<br>
+    at a <span class="hl-green">time</span>
+  </h1>
+  <p>
+    An interactive reference for learning Neovim — from first steps to advanced configuration.
+    Pick a section below and start building muscle memory.
+  </p>
   <div class="btn-row">
-    <a href="practice.html" class="btn btn-primary">&#9654; Interactive Practice</a>
-    <a href="advanced.html" class="btn btn-secondary">Advanced Features</a>
+    <a href="tutorial.html" class="btn btn-primary">&#9654; Start Tutorial</a>
+    <a href="practice.html" class="btn btn-secondary">Interactive Practice</a>
   </div>
 </div>
 
-<div class="container">
+<div class="container" style="max-width: 980px;">
 
-  <!-- MODES -->
-  <div class="section-title"><span class="dot">&#9632;</span> Modes</div>
-  <div class="section-subtitle">Neovim is modal — each mode handles keypresses differently.</div>
-  <div class="card-grid">
-    <div class="card">
-      <div class="card-title"><span class="mode-badge mode-normal">NORMAL</span></div>
-      <p class="key-desc" style="margin-bottom:0.8rem;">The default mode. Used for navigation and editing commands. Press <kbd>Esc</kbd> from any mode to return here.</p>
-      <table class="key-table">
-        <tr><td><kbd>Esc</kbd></td><td class="key-desc">Return to Normal mode</td></tr>
-        <tr><td><kbd>Ctrl</kbd>+<kbd>[</kbd></td><td class="key-desc">Also returns to Normal mode</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="mode-badge mode-insert">INSERT</span></div>
-      <p class="key-desc" style="margin-bottom:0.8rem;">Text input mode. Keys you press are inserted literally.</p>
-      <table class="key-table">
-        <tr><td><kbd>i</kbd></td><td class="key-desc">Insert before cursor</td></tr>
-        <tr><td><kbd>a</kbd></td><td class="key-desc">Append after cursor</td></tr>
-        <tr><td><kbd>I</kbd></td><td class="key-desc">Insert at start of line</td></tr>
-        <tr><td><kbd>A</kbd></td><td class="key-desc">Append at end of line</td></tr>
-        <tr><td><kbd>o</kbd></td><td class="key-desc">New line below, insert</td></tr>
-        <tr><td><kbd>O</kbd></td><td class="key-desc">New line above, insert</td></tr>
-        <tr><td><kbd>s</kbd></td><td class="key-desc">Delete char, insert</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="mode-badge mode-visual">VISUAL</span></div>
-      <p class="key-desc" style="margin-bottom:0.8rem;">Select text to operate on.</p>
-      <table class="key-table">
-        <tr><td><kbd>v</kbd></td><td class="key-desc">Character-wise visual</td></tr>
-        <tr><td><kbd>V</kbd></td><td class="key-desc">Line-wise visual</td></tr>
-        <tr><td><kbd>Ctrl</kbd>+<kbd>v</kbd></td><td class="key-desc">Block visual (column)</td></tr>
-        <tr><td><kbd>gv</kbd></td><td class="key-desc">Reselect last visual</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title"><span class="mode-badge mode-command">COMMAND</span></div>
-      <p class="key-desc" style="margin-bottom:0.8rem;">Run Ex commands via the command line.</p>
-      <table class="key-table">
-        <tr><td><kbd>:</kbd></td><td class="key-desc">Open command line</td></tr>
-        <tr><td><kbd>/</kbd></td><td class="key-desc">Search forward</td></tr>
-        <tr><td><kbd>?</kbd></td><td class="key-desc">Search backward</td></tr>
-        <tr><td><kbd>!</kbd></td><td class="key-desc">Filter through shell cmd</td></tr>
-      </table>
-    </div>
-  </div>
+  <div class="home-divider">Sections</div>
 
-  <!-- BASIC MOVEMENT -->
-  <div class="section-title"><span class="dot">&#9632;</span> Basic Movement</div>
-  <div class="section-subtitle">In Normal mode, move without the arrow keys.</div>
-  <div class="card-grid">
-    <div class="card">
-      <div class="card-title">&#9650; Character Motions</div>
-      <table class="key-table">
-        <tr><td><kbd>h</kbd></td><td class="key-desc">Move left</td></tr>
-        <tr><td><kbd>j</kbd></td><td class="key-desc">Move down</td></tr>
-        <tr><td><kbd>k</kbd></td><td class="key-desc">Move up</td></tr>
-        <tr><td><kbd>l</kbd></td><td class="key-desc">Move right</td></tr>
-      </table>
-      <div class="callout tip" style="margin-top:1rem;">
-        <strong>Tip:</strong> Combine with a count: <kbd>5j</kbd> moves down 5 lines.
+  <div class="page-card-grid">
+
+    <a href="basics.html" class="page-card" style="--card-accent: var(--accent)">
+      <div class="page-card-icon">⌨</div>
+      <div class="page-card-title">Basics</div>
+      <div class="page-card-desc">
+        Modes, motions, operators, and essential commands — the complete foundation
+        of working in Vim.
       </div>
-    </div>
-    <div class="card">
-      <div class="card-title">&#9654; Word Motions</div>
-      <table class="key-table">
-        <tr><td><kbd>w</kbd></td><td class="key-desc">Next word start</td></tr>
-        <tr><td><kbd>W</kbd></td><td class="key-desc">Next WORD start (whitespace-delimited)</td></tr>
-        <tr><td><kbd>b</kbd></td><td class="key-desc">Previous word start</td></tr>
-        <tr><td><kbd>B</kbd></td><td class="key-desc">Previous WORD start</td></tr>
-        <tr><td><kbd>e</kbd></td><td class="key-desc">Current/next word end</td></tr>
-        <tr><td><kbd>E</kbd></td><td class="key-desc">Current/next WORD end</td></tr>
-        <tr><td><kbd>ge</kbd></td><td class="key-desc">Previous word end</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title">&#9646; Line Motions</div>
-      <table class="key-table">
-        <tr><td><kbd>0</kbd></td><td class="key-desc">Start of line</td></tr>
-        <tr><td><kbd>^</kbd></td><td class="key-desc">First non-blank character</td></tr>
-        <tr><td><kbd>$</kbd></td><td class="key-desc">End of line</td></tr>
-        <tr><td><kbd>g_</kbd></td><td class="key-desc">Last non-blank character</td></tr>
-        <tr><td><kbd>f{c}</kbd></td><td class="key-desc">Jump to char <em>c</em> on line</td></tr>
-        <tr><td><kbd>F{c}</kbd></td><td class="key-desc">Jump back to char <em>c</em></td></tr>
-        <tr><td><kbd>t{c}</kbd></td><td class="key-desc">Jump before char <em>c</em></td></tr>
-        <tr><td><kbd>;</kbd> / <kbd>,</kbd></td><td class="key-desc">Repeat f/t forward/back</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title">&#11835; File / Screen Motions</div>
-      <table class="key-table">
-        <tr><td><kbd>gg</kbd></td><td class="key-desc">Top of file</td></tr>
-        <tr><td><kbd>G</kbd></td><td class="key-desc">Bottom of file</td></tr>
-        <tr><td><kbd>{n}G</kbd></td><td class="key-desc">Go to line n</td></tr>
-        <tr><td><kbd>%</kbd></td><td class="key-desc">Jump to matching bracket</td></tr>
-        <tr><td><kbd>H</kbd></td><td class="key-desc">Top of screen</td></tr>
-        <tr><td><kbd>M</kbd></td><td class="key-desc">Middle of screen</td></tr>
-        <tr><td><kbd>L</kbd></td><td class="key-desc">Bottom of screen</td></tr>
-        <tr><td><kbd>Ctrl</kbd>+<kbd>d</kbd></td><td class="key-desc">Scroll down half page</td></tr>
-        <tr><td><kbd>Ctrl</kbd>+<kbd>u</kbd></td><td class="key-desc">Scroll up half page</td></tr>
-        <tr><td><kbd>Ctrl</kbd>+<kbd>f</kbd></td><td class="key-desc">Scroll full page down</td></tr>
-        <tr><td><kbd>Ctrl</kbd>+<kbd>b</kbd></td><td class="key-desc">Scroll full page up</td></tr>
-      </table>
-    </div>
-  </div>
+      <div class="page-card-tags">
+        <span class="page-card-tag">Modes</span>
+        <span class="page-card-tag">Motions</span>
+        <span class="page-card-tag">Operators</span>
+        <span class="page-card-tag">Search</span>
+      </div>
+      <div class="page-card-arrow">→ Read the basics</div>
+    </a>
 
-  <!-- EDITING -->
-  <div class="section-title"><span class="dot">&#9632;</span> Editing in Normal Mode</div>
-  <div class="section-subtitle">Operators act on motions — the real power of Vim.</div>
-  <div class="card-grid">
-    <div class="card">
-      <div class="card-title">&#9998; Operators</div>
-      <p class="key-desc" style="margin-bottom:0.8rem;">Operators combine with motions: <kbd>d</kbd>+<kbd>w</kbd> = delete word.</p>
-      <table class="key-table">
-        <tr><td><kbd>d</kbd></td><td class="key-desc">Delete (cut)</td></tr>
-        <tr><td><kbd>y</kbd></td><td class="key-desc">Yank (copy)</td></tr>
-        <tr><td><kbd>c</kbd></td><td class="key-desc">Change (delete + insert)</td></tr>
-        <tr><td><kbd>&gt;</kbd></td><td class="key-desc">Indent right</td></tr>
-        <tr><td><kbd>&lt;</kbd></td><td class="key-desc">Indent left</td></tr>
-        <tr><td><kbd>=</kbd></td><td class="key-desc">Auto-indent</td></tr>
-        <tr><td><kbd>g~</kbd></td><td class="key-desc">Toggle case</td></tr>
-        <tr><td><kbd>gu</kbd></td><td class="key-desc">Lowercase</td></tr>
-        <tr><td><kbd>gU</kbd></td><td class="key-desc">Uppercase</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title">&#8855; Common Combos</div>
-      <table class="key-table">
-        <tr><td><kbd>dd</kbd></td><td class="key-desc">Delete line</td></tr>
-        <tr><td><kbd>yy</kbd></td><td class="key-desc">Yank line</td></tr>
-        <tr><td><kbd>cc</kbd></td><td class="key-desc">Change line</td></tr>
-        <tr><td><kbd>dw</kbd></td><td class="key-desc">Delete word</td></tr>
-        <tr><td><kbd>d$</kbd></td><td class="key-desc">Delete to end of line</td></tr>
-        <tr><td><kbd>ciw</kbd></td><td class="key-desc">Change inner word</td></tr>
-        <tr><td><kbd>ci"</kbd></td><td class="key-desc">Change inside quotes</td></tr>
-        <tr><td><kbd>da(</kbd></td><td class="key-desc">Delete around parens</td></tr>
-        <tr><td><kbd>yip</kbd></td><td class="key-desc">Yank inner paragraph</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title">&#8629; Undo &amp; Paste</div>
-      <table class="key-table">
-        <tr><td><kbd>u</kbd></td><td class="key-desc">Undo</td></tr>
-        <tr><td><kbd>Ctrl</kbd>+<kbd>r</kbd></td><td class="key-desc">Redo</td></tr>
-        <tr><td><kbd>p</kbd></td><td class="key-desc">Paste after cursor/line</td></tr>
-        <tr><td><kbd>P</kbd></td><td class="key-desc">Paste before cursor/line</td></tr>
-        <tr><td><kbd>"0p</kbd></td><td class="key-desc">Paste from yank register</td></tr>
-        <tr><td><kbd>x</kbd></td><td class="key-desc">Delete character (cut)</td></tr>
-        <tr><td><kbd>r{c}</kbd></td><td class="key-desc">Replace char with c</td></tr>
-        <tr><td><kbd>R</kbd></td><td class="key-desc">Replace mode (overtype)</td></tr>
-        <tr><td><kbd>.</kbd></td><td class="key-desc">Repeat last change</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title">&#128269; Search</div>
-      <table class="key-table">
-        <tr><td><kbd>/pattern</kbd></td><td class="key-desc">Search forward</td></tr>
-        <tr><td><kbd>?pattern</kbd></td><td class="key-desc">Search backward</td></tr>
-        <tr><td><kbd>n</kbd></td><td class="key-desc">Next match</td></tr>
-        <tr><td><kbd>N</kbd></td><td class="key-desc">Previous match</td></tr>
-        <tr><td><kbd>*</kbd></td><td class="key-desc">Search word under cursor (fwd)</td></tr>
-        <tr><td><kbd>#</kbd></td><td class="key-desc">Search word under cursor (bwd)</td></tr>
-        <tr><td><kbd>:noh</kbd></td><td class="key-desc">Clear search highlight</td></tr>
-      </table>
-    </div>
-  </div>
+    <a href="advanced.html" class="page-card" style="--card-accent: var(--accent2)">
+      <div class="page-card-icon">⚡</div>
+      <div class="page-card-title">Advanced</div>
+      <div class="page-card-desc">
+        Registers, macros, marks, folds, windows, the LSP, Treesitter, and
+        Lua-based configuration.
+      </div>
+      <div class="page-card-tags">
+        <span class="page-card-tag">Macros</span>
+        <span class="page-card-tag">LSP</span>
+        <span class="page-card-tag">Lua Config</span>
+        <span class="page-card-tag">Plugins</span>
+      </div>
+      <div class="page-card-arrow">→ Go advanced</div>
+    </a>
 
-  <!-- COMMANDS -->
-  <div class="section-title"><span class="dot">&#9632;</span> Essential Commands</div>
-  <div class="section-subtitle">Run with <kbd>:</kbd> in Normal mode.</div>
-  <div class="card-grid">
-    <div class="card">
-      <div class="card-title">&#128190; File Commands</div>
-      <table class="key-table">
-        <tr><td><kbd>:w</kbd></td><td class="key-desc">Write (save)</td></tr>
-        <tr><td><kbd>:w filename</kbd></td><td class="key-desc">Save as filename</td></tr>
-        <tr><td><kbd>:q</kbd></td><td class="key-desc">Quit</td></tr>
-        <tr><td><kbd>:q!</kbd></td><td class="key-desc">Quit without saving</td></tr>
-        <tr><td><kbd>:wq</kbd></td><td class="key-desc">Save and quit</td></tr>
-        <tr><td><kbd>:x</kbd></td><td class="key-desc">Save and quit (if changed)</td></tr>
-        <tr><td><kbd>:e filename</kbd></td><td class="key-desc">Open file</td></tr>
-        <tr><td><kbd>:e!</kbd></td><td class="key-desc">Reload file (discard changes)</td></tr>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title">&#128260; Substitution</div>
-      <table class="key-table">
-        <tr><td><kbd>:s/old/new</kbd></td><td class="key-desc">Replace first on current line</td></tr>
-        <tr><td><kbd>:s/old/new/g</kbd></td><td class="key-desc">Replace all on current line</td></tr>
-        <tr><td><kbd>:%s/old/new/g</kbd></td><td class="key-desc">Replace all in file</td></tr>
-        <tr><td><kbd>:%s/old/new/gc</kbd></td><td class="key-desc">Replace with confirmation</td></tr>
-        <tr><td><kbd>:'&lt;,'&gt;s/o/n/g</kbd></td><td class="key-desc">Replace in visual selection</td></tr>
-      </table>
-    </div>
-  </div>
+    <a href="vs-vim.html" class="page-card" style="--card-accent: var(--orange)">
+      <div class="page-card-icon">⚖</div>
+      <div class="page-card-title">Vim vs Neovim</div>
+      <div class="page-card-desc">
+        Side-by-side comparison of Vim and Neovim — what's different, what's new,
+        and why most people choose Neovim.
+      </div>
+      <div class="page-card-tags">
+        <span class="page-card-tag">Comparison</span>
+        <span class="page-card-tag">Features</span>
+      </div>
+      <div class="page-card-arrow">→ See the differences</div>
+    </a>
 
-  <div class="callout">
-    <strong>Pro tip:</strong> Use <kbd>:help {topic}</kbd> to access Neovim's comprehensive built-in documentation. For example, <kbd>:help motion.txt</kbd> or <kbd>:help operator</kbd>.
-  </div>
+    <a href="vscode-to-nvim.html" class="page-card" style="--card-accent: var(--teal)">
+      <div class="page-card-icon">🔀</div>
+      <div class="page-card-title">VS Code → Nvim</div>
+      <div class="page-card-desc">
+        A practical guide for developers switching from VS Code to Neovim, mapping
+        familiar workflows to their Vim equivalents.
+      </div>
+      <div class="page-card-tags">
+        <span class="page-card-tag">VS Code</span>
+        <span class="page-card-tag">Migration</span>
+        <span class="page-card-tag">Workflow</span>
+      </div>
+      <div class="page-card-arrow">→ Make the switch</div>
+    </a>
 
+    <a href="tutorial.html" class="page-card" style="--card-accent: var(--green)">
+      <div class="page-card-icon">📖</div>
+      <div class="page-card-title">Tutorial</div>
+      <div class="page-card-desc">
+        A step-by-step walkthrough for new Vim users — learn by doing with guided
+        exercises that build on each other.
+      </div>
+      <div class="page-card-tags">
+        <span class="page-card-tag">Beginner</span>
+        <span class="page-card-tag">Step-by-step</span>
+      </div>
+      <div class="page-card-arrow">→ Start learning</div>
+    </a>
+
+    <a href="cheatsheet.html" class="page-card" style="--card-accent: var(--yellow)">
+      <div class="page-card-icon">📋</div>
+      <div class="page-card-title">Cheatsheet</div>
+      <div class="page-card-desc">
+        A compact, printable quick-reference card covering all the keybindings you
+        need on a single page.
+      </div>
+      <div class="page-card-tags">
+        <span class="page-card-tag">Reference</span>
+        <span class="page-card-tag">Printable</span>
+      </div>
+      <div class="page-card-arrow">→ Open cheatsheet</div>
+    </a>
+
+    <a href="practice.html" class="page-card" style="--card-accent: var(--red)">
+      <div class="page-card-icon">🎯</div>
+      <div class="page-card-title">Practice</div>
+      <div class="page-card-desc">
+        A browser-based interactive Vim editor — drill your commands and build
+        muscle memory without leaving the browser.
+      </div>
+      <div class="page-card-tags">
+        <span class="page-card-tag">Interactive</span>
+        <span class="page-card-tag">Exercises</span>
+        <span class="page-card-tag">Hands-on</span>
+      </div>
+      <div class="page-card-arrow">→ Start practicing</div>
+    </a>
+
+  </div>
 </div>
 
 <footer>

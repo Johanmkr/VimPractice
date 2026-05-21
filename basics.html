@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Guide — Navigation & Basics</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="basics.html" class="active">Basics</a></li>
+    <li><a href="advanced.html">Advanced</a></li>
+    <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="vscode-to-nvim.html">VS Code → Nvim</a></li>
+    <li><a href="tutorial.html">Tutorial</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+    <li><a href="practice.html">Practice</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <h1><span class="hl-accent">Navigate</span> Neovim<br>like a <span class="hl-green">pro</span></h1>
+  <p>Learn the fundamentals of Neovim — modes, motions, operators, and commands — then put them to practice in the interactive editor.</p>
+  <div class="btn-row">
+    <a href="practice.html" class="btn btn-primary">&#9654; Interactive Practice</a>
+    <a href="advanced.html" class="btn btn-secondary">Advanced Features</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- MODES -->
+  <div class="section-title"><span class="dot">&#9632;</span> Modes</div>
+  <div class="section-subtitle">Neovim is modal — each mode handles keypresses differently.</div>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title"><span class="mode-badge mode-normal">NORMAL</span></div>
+      <p class="key-desc" style="margin-bottom:0.8rem;">The default mode. Used for navigation and editing commands. Press <kbd>Esc</kbd> from any mode to return here.</p>
+      <table class="key-table">
+        <tr><td><kbd>Esc</kbd></td><td class="key-desc">Return to Normal mode</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>[</kbd></td><td class="key-desc">Also returns to Normal mode</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="mode-badge mode-insert">INSERT</span></div>
+      <p class="key-desc" style="margin-bottom:0.8rem;">Text input mode. Keys you press are inserted literally.</p>
+      <table class="key-table">
+        <tr><td><kbd>i</kbd></td><td class="key-desc">Insert before cursor</td></tr>
+        <tr><td><kbd>a</kbd></td><td class="key-desc">Append after cursor</td></tr>
+        <tr><td><kbd>I</kbd></td><td class="key-desc">Insert at start of line</td></tr>
+        <tr><td><kbd>A</kbd></td><td class="key-desc">Append at end of line</td></tr>
+        <tr><td><kbd>o</kbd></td><td class="key-desc">New line below, insert</td></tr>
+        <tr><td><kbd>O</kbd></td><td class="key-desc">New line above, insert</td></tr>
+        <tr><td><kbd>s</kbd></td><td class="key-desc">Delete char, insert</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="mode-badge mode-visual">VISUAL</span></div>
+      <p class="key-desc" style="margin-bottom:0.8rem;">Select text to operate on.</p>
+      <table class="key-table">
+        <tr><td><kbd>v</kbd></td><td class="key-desc">Character-wise visual</td></tr>
+        <tr><td><kbd>V</kbd></td><td class="key-desc">Line-wise visual</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>v</kbd></td><td class="key-desc">Block visual (column)</td></tr>
+        <tr><td><kbd>gv</kbd></td><td class="key-desc">Reselect last visual</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="mode-badge mode-command">COMMAND</span></div>
+      <p class="key-desc" style="margin-bottom:0.8rem;">Run Ex commands via the command line.</p>
+      <table class="key-table">
+        <tr><td><kbd>:</kbd></td><td class="key-desc">Open command line</td></tr>
+        <tr><td><kbd>/</kbd></td><td class="key-desc">Search forward</td></tr>
+        <tr><td><kbd>?</kbd></td><td class="key-desc">Search backward</td></tr>
+        <tr><td><kbd>!</kbd></td><td class="key-desc">Filter through shell cmd</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- BASIC MOVEMENT -->
+  <div class="section-title"><span class="dot">&#9632;</span> Basic Movement</div>
+  <div class="section-subtitle">In Normal mode, move without the arrow keys.</div>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">&#9650; Character Motions</div>
+      <table class="key-table">
+        <tr><td><kbd>h</kbd></td><td class="key-desc">Move left</td></tr>
+        <tr><td><kbd>j</kbd></td><td class="key-desc">Move down</td></tr>
+        <tr><td><kbd>k</kbd></td><td class="key-desc">Move up</td></tr>
+        <tr><td><kbd>l</kbd></td><td class="key-desc">Move right</td></tr>
+      </table>
+      <div class="callout tip" style="margin-top:1rem;">
+        <strong>Tip:</strong> Combine with a count: <kbd>5j</kbd> moves down 5 lines.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#9654; Word Motions</div>
+      <table class="key-table">
+        <tr><td><kbd>w</kbd></td><td class="key-desc">Next word start</td></tr>
+        <tr><td><kbd>W</kbd></td><td class="key-desc">Next WORD start (whitespace-delimited)</td></tr>
+        <tr><td><kbd>b</kbd></td><td class="key-desc">Previous word start</td></tr>
+        <tr><td><kbd>B</kbd></td><td class="key-desc">Previous WORD start</td></tr>
+        <tr><td><kbd>e</kbd></td><td class="key-desc">Current/next word end</td></tr>
+        <tr><td><kbd>E</kbd></td><td class="key-desc">Current/next WORD end</td></tr>
+        <tr><td><kbd>ge</kbd></td><td class="key-desc">Previous word end</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">&#9646; Line Motions</div>
+      <table class="key-table">
+        <tr><td><kbd>0</kbd></td><td class="key-desc">Start of line</td></tr>
+        <tr><td><kbd>^</kbd></td><td class="key-desc">First non-blank character</td></tr>
+        <tr><td><kbd>$</kbd></td><td class="key-desc">End of line</td></tr>
+        <tr><td><kbd>g_</kbd></td><td class="key-desc">Last non-blank character</td></tr>
+        <tr><td><kbd>f{c}</kbd></td><td class="key-desc">Jump to char <em>c</em> on line</td></tr>
+        <tr><td><kbd>F{c}</kbd></td><td class="key-desc">Jump back to char <em>c</em></td></tr>
+        <tr><td><kbd>t{c}</kbd></td><td class="key-desc">Jump before char <em>c</em></td></tr>
+        <tr><td><kbd>;</kbd> / <kbd>,</kbd></td><td class="key-desc">Repeat f/t forward/back</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">&#11835; File / Screen Motions</div>
+      <table class="key-table">
+        <tr><td><kbd>gg</kbd></td><td class="key-desc">Top of file</td></tr>
+        <tr><td><kbd>G</kbd></td><td class="key-desc">Bottom of file</td></tr>
+        <tr><td><kbd>{n}G</kbd></td><td class="key-desc">Go to line n</td></tr>
+        <tr><td><kbd>%</kbd></td><td class="key-desc">Jump to matching bracket</td></tr>
+        <tr><td><kbd>H</kbd></td><td class="key-desc">Top of screen</td></tr>
+        <tr><td><kbd>M</kbd></td><td class="key-desc">Middle of screen</td></tr>
+        <tr><td><kbd>L</kbd></td><td class="key-desc">Bottom of screen</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>d</kbd></td><td class="key-desc">Scroll down half page</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>u</kbd></td><td class="key-desc">Scroll up half page</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>f</kbd></td><td class="key-desc">Scroll full page down</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>b</kbd></td><td class="key-desc">Scroll full page up</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- EDITING -->
+  <div class="section-title"><span class="dot">&#9632;</span> Editing in Normal Mode</div>
+  <div class="section-subtitle">Operators act on motions — the real power of Vim.</div>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">&#9998; Operators</div>
+      <p class="key-desc" style="margin-bottom:0.8rem;">Operators combine with motions: <kbd>d</kbd>+<kbd>w</kbd> = delete word.</p>
+      <table class="key-table">
+        <tr><td><kbd>d</kbd></td><td class="key-desc">Delete (cut)</td></tr>
+        <tr><td><kbd>y</kbd></td><td class="key-desc">Yank (copy)</td></tr>
+        <tr><td><kbd>c</kbd></td><td class="key-desc">Change (delete + insert)</td></tr>
+        <tr><td><kbd>&gt;</kbd></td><td class="key-desc">Indent right</td></tr>
+        <tr><td><kbd>&lt;</kbd></td><td class="key-desc">Indent left</td></tr>
+        <tr><td><kbd>=</kbd></td><td class="key-desc">Auto-indent</td></tr>
+        <tr><td><kbd>g~</kbd></td><td class="key-desc">Toggle case</td></tr>
+        <tr><td><kbd>gu</kbd></td><td class="key-desc">Lowercase</td></tr>
+        <tr><td><kbd>gU</kbd></td><td class="key-desc">Uppercase</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">&#8855; Common Combos</div>
+      <table class="key-table">
+        <tr><td><kbd>dd</kbd></td><td class="key-desc">Delete line</td></tr>
+        <tr><td><kbd>yy</kbd></td><td class="key-desc">Yank line</td></tr>
+        <tr><td><kbd>cc</kbd></td><td class="key-desc">Change line</td></tr>
+        <tr><td><kbd>dw</kbd></td><td class="key-desc">Delete word</td></tr>
+        <tr><td><kbd>d$</kbd></td><td class="key-desc">Delete to end of line</td></tr>
+        <tr><td><kbd>ciw</kbd></td><td class="key-desc">Change inner word</td></tr>
+        <tr><td><kbd>ci"</kbd></td><td class="key-desc">Change inside quotes</td></tr>
+        <tr><td><kbd>da(</kbd></td><td class="key-desc">Delete around parens</td></tr>
+        <tr><td><kbd>yip</kbd></td><td class="key-desc">Yank inner paragraph</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">&#8629; Undo &amp; Paste</div>
+      <table class="key-table">
+        <tr><td><kbd>u</kbd></td><td class="key-desc">Undo</td></tr>
+        <tr><td><kbd>Ctrl</kbd>+<kbd>r</kbd></td><td class="key-desc">Redo</td></tr>
+        <tr><td><kbd>p</kbd></td><td class="key-desc">Paste after cursor/line</td></tr>
+        <tr><td><kbd>P</kbd></td><td class="key-desc">Paste before cursor/line</td></tr>
+        <tr><td><kbd>"0p</kbd></td><td class="key-desc">Paste from yank register</td></tr>
+        <tr><td><kbd>x</kbd></td><td class="key-desc">Delete character (cut)</td></tr>
+        <tr><td><kbd>r{c}</kbd></td><td class="key-desc">Replace char with c</td></tr>
+        <tr><td><kbd>R</kbd></td><td class="key-desc">Replace mode (overtype)</td></tr>
+        <tr><td><kbd>.</kbd></td><td class="key-desc">Repeat last change</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128269; Search</div>
+      <table class="key-table">
+        <tr><td><kbd>/pattern</kbd></td><td class="key-desc">Search forward</td></tr>
+        <tr><td><kbd>?pattern</kbd></td><td class="key-desc">Search backward</td></tr>
+        <tr><td><kbd>n</kbd></td><td class="key-desc">Next match</td></tr>
+        <tr><td><kbd>N</kbd></td><td class="key-desc">Previous match</td></tr>
+        <tr><td><kbd>*</kbd></td><td class="key-desc">Search word under cursor (fwd)</td></tr>
+        <tr><td><kbd>#</kbd></td><td class="key-desc">Search word under cursor (bwd)</td></tr>
+        <tr><td><kbd>:noh</kbd></td><td class="key-desc">Clear search highlight</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- COMMANDS -->
+  <div class="section-title"><span class="dot">&#9632;</span> Essential Commands</div>
+  <div class="section-subtitle">Run with <kbd>:</kbd> in Normal mode.</div>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">&#128190; File Commands</div>
+      <table class="key-table">
+        <tr><td><kbd>:w</kbd></td><td class="key-desc">Write (save)</td></tr>
+        <tr><td><kbd>:w filename</kbd></td><td class="key-desc">Save as filename</td></tr>
+        <tr><td><kbd>:q</kbd></td><td class="key-desc">Quit</td></tr>
+        <tr><td><kbd>:q!</kbd></td><td class="key-desc">Quit without saving</td></tr>
+        <tr><td><kbd>:wq</kbd></td><td class="key-desc">Save and quit</td></tr>
+        <tr><td><kbd>:x</kbd></td><td class="key-desc">Save and quit (if changed)</td></tr>
+        <tr><td><kbd>:e filename</kbd></td><td class="key-desc">Open file</td></tr>
+        <tr><td><kbd>:e!</kbd></td><td class="key-desc">Reload file (discard changes)</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128260; Substitution</div>
+      <table class="key-table">
+        <tr><td><kbd>:s/old/new</kbd></td><td class="key-desc">Replace first on current line</td></tr>
+        <tr><td><kbd>:s/old/new/g</kbd></td><td class="key-desc">Replace all on current line</td></tr>
+        <tr><td><kbd>:%s/old/new/g</kbd></td><td class="key-desc">Replace all in file</td></tr>
+        <tr><td><kbd>:%s/old/new/gc</kbd></td><td class="key-desc">Replace with confirmation</td></tr>
+        <tr><td><kbd>:'&lt;,'&gt;s/o/n/g</kbd></td><td class="key-desc">Replace in visual selection</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Pro tip:</strong> Use <kbd>:help {topic}</kbd> to access Neovim's comprehensive built-in documentation. For example, <kbd>:help motion.txt</kbd> or <kbd>:help operator</kbd>.
+  </div>
+
+</div>
+
+<footer>
+  <p>Neovim Guide &mdash; <a href="https://neovim.io" target="_blank">neovim.io</a> &mdash; <a href="practice.html">Practice Now</a></p>
+</footer>
+
+</body>
+</html>
