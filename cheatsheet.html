@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Guide — Cheatsheet</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .cheat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .cheat-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .cheat-card-header {
+      padding: 0.55rem 0.9rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cheat-card-header.nav    { background: rgba(122,162,247,0.12); color: var(--accent); }
+    .cheat-card-header.insert { background: rgba(158,206,106,0.12); color: var(--green); }
+    .cheat-card-header.edit   { background: rgba(255,158,100,0.12); color: var(--orange); }
+    .cheat-card-header.visual { background: rgba(187,154,247,0.12); color: var(--accent2); }
+    .cheat-card-header.search { background: rgba(115,218,202,0.12); color: var(--teal); }
+    .cheat-card-header.cmd    { background: rgba(224,175,104,0.12); color: var(--yellow); }
+    .cheat-card-header.adv    { background: rgba(247,118,142,0.12); color: var(--red); }
+
+    .cheat-card-body {
+      padding: 0.5rem 0.9rem 0.75rem;
+    }
+
+    .cheat-row {
+      display: grid;
+      grid-template-columns: minmax(110px, auto) 1fr;
+      gap: 0.4rem 0.6rem;
+      align-items: start;
+      padding: 0.18rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.82rem;
+    }
+    .cheat-row:last-child { border-bottom: none; }
+
+    .ck { color: var(--orange); white-space: nowrap; }
+    .ck kbd {
+      display: inline-block;
+      background: var(--bg4);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-bottom-width: 2px;
+      border-radius: 3px;
+      padding: 0 0.35rem;
+      font-family: inherit;
+      font-size: 0.78rem;
+      color: var(--orange);
+      margin-right: 2px;
+    }
+    .cv { color: var(--fg2); }
+
+    /* Operator table */
+    .op-table {
+      width: 100%;
+      font-size: 0.82rem;
+      border-collapse: collapse;
+      margin: 0.3rem 0 0.6rem;
+    }
+    .op-table th {
+      background: var(--bg4);
+      color: var(--fg3);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.3rem 0.5rem;
+      text-align: left;
+      font-weight: 600;
+    }
+    .op-table td {
+      padding: 0.25rem 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--fg2);
+      vertical-align: top;
+    }
+    .op-table td.op-key { color: var(--orange); white-space: nowrap; }
+
+    .section-h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin: 2rem 0 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .print-btn {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      transition: transform 0.15s;
+      z-index: 50;
+    }
+    .print-btn:hover { transform: scale(1.08); }
+
+    @media print {
+      nav, .print-btn, footer { display: none !important; }
+      body { background: white; color: black; }
+      .cheat-card { border-color: #ccc; break-inside: avoid; }
+      .cheat-card-header.nav    { background: #e8f0fe; color: #1a56db; }
+      .cheat-card-header.insert { background: #e8f5e9; color: #2e7d32; }
+      .cheat-card-header.edit   { background: #fff3e0; color: #e65100; }
+      .cheat-card-header.visual { background: #f3e5f5; color: #6a1b9a; }
+      .cheat-card-header.search { background: #e0f7fa; color: #006064; }
+      .cheat-card-header.cmd    { background: #fffde7; color: #f57f17; }
+      .cheat-card-header.adv    { background: #fce4ec; color: #880e4f; }
+      .ck { color: #c62828; }
+      .ck kbd { color: #c62828; border-color: #ccc; background: #f5f5f5; }
+      .cv { color: #333; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="index.html">Basics</a></li>
+    <li><a href="advanced.html">Advanced</a></li>
+    <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="cheatsheet.html" class="active">Cheatsheet</a></li>
+    <li><a href="practice.html">Practice</a></li>
+  </ul>
+</nav>
+
+<button class="print-btn" onclick="window.print()" title="Print / Save as PDF">&#128438;</button>
+
+<div class="page-header">
+  <div class="container">
+    <h1>&#9889; Neovim Cheatsheet</h1>
+    <p>All essential commands in one place. Click the printer icon to save as PDF.</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- MODES QUICK VIEW -->
+  <div class="section-h2">&#9632; Modes at a Glance</div>
+  <div style="display:flex;gap:0.7rem;flex-wrap:wrap;margin-bottom:2rem;">
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 1.1rem;text-align:center;min-width:130px;">
+      <div style="font-size:0.65rem;color:var(--fg3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">enter with</div>
+      <div style="font-weight:700;color:var(--accent);font-size:0.95rem;margin-bottom:0.2rem;">NORMAL</div>
+      <kbd>Esc</kbd> from anywhere
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 1.1rem;text-align:center;min-width:130px;">
+      <div style="font-size:0.65rem;color:var(--fg3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">enter with</div>
+      <div style="font-weight:700;color:var(--green);font-size:0.95rem;margin-bottom:0.2rem;">INSERT</div>
+      <kbd>i</kbd> <kbd>a</kbd> <kbd>o</kbd> <kbd>I</kbd> <kbd>A</kbd> <kbd>O</kbd>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 1.1rem;text-align:center;min-width:130px;">
+      <div style="font-size:0.65rem;color:var(--fg3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">enter with</div>
+      <div style="font-weight:700;color:var(--accent2);font-size:0.95rem;margin-bottom:0.2rem;">VISUAL</div>
+      <kbd>v</kbd> <kbd>V</kbd> <kbd>Ctrl+v</kbd>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 1.1rem;text-align:center;min-width:130px;">
+      <div style="font-size:0.65rem;color:var(--fg3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.3rem;">enter with</div>
+      <div style="font-weight:700;color:var(--yellow);font-size:0.95rem;margin-bottom:0.2rem;">COMMAND</div>
+      <kbd>:</kbd> or <kbd>/</kbd> or <kbd>?</kbd>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="section-h2">&#9632; Normal Mode Reference</div>
+  <div class="cheat-grid">
+
+    <!-- Navigation: Character -->
+    <div class="cheat-card">
+      <div class="cheat-card-header nav">&#9650; Character &amp; Line Motion</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>h</kbd><kbd>j</kbd><kbd>k</kbd><kbd>l</kbd></span><span class="cv">← ↓ ↑ → (also arrow keys)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>0</kbd></span><span class="cv">Start of line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>^</kbd></span><span class="cv">First non-blank char</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>$</kbd></span><span class="cv">End of line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>g_</kbd></span><span class="cv">Last non-blank char</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>f</kbd><em>c</em></span><span class="cv">Jump TO char <em>c</em> on line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>F</kbd><em>c</em></span><span class="cv">Jump TO char <em>c</em> backwards</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>t</kbd><em>c</em></span><span class="cv">Jump BEFORE char <em>c</em></span></div>
+        <div class="cheat-row"><span class="ck"><kbd>T</kbd><em>c</em></span><span class="cv">Jump BEFORE char <em>c</em> bwd</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>;</kbd> / <kbd>,</kbd></span><span class="cv">Repeat f/t forward / backward</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>%</kbd></span><span class="cv">Jump to matching bracket</span></div>
+      </div>
+    </div>
+
+    <!-- Navigation: Word -->
+    <div class="cheat-card">
+      <div class="cheat-card-header nav">&#9654; Word Motion</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>w</kbd></span><span class="cv">Next word start</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>W</kbd></span><span class="cv">Next WORD start (whitespace)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>b</kbd></span><span class="cv">Prev word start</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>B</kbd></span><span class="cv">Prev WORD start</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>e</kbd></span><span class="cv">Word end forward</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>E</kbd></span><span class="cv">WORD end forward</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>ge</kbd></span><span class="cv">Word end backward</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>gE</kbd></span><span class="cv">WORD end backward</span></div>
+      </div>
+    </div>
+
+    <!-- Navigation: Screen/File -->
+    <div class="cheat-card">
+      <div class="cheat-card-header nav">&#11835; Screen &amp; File Motion</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>gg</kbd></span><span class="cv">Top of file</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>G</kbd></span><span class="cv">Bottom of file</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>{n}G</kbd></span><span class="cv">Go to line n</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:{n}</kbd></span><span class="cv">Go to line n (command)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>H</kbd></span><span class="cv">Top of visible screen</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>M</kbd></span><span class="cv">Middle of visible screen</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>L</kbd></span><span class="cv">Bottom of visible screen</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+d</kbd></span><span class="cv">Scroll down ½ page</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+u</kbd></span><span class="cv">Scroll up ½ page</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+f</kbd></span><span class="cv">Scroll full page down</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+b</kbd></span><span class="cv">Scroll full page up</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>zz</kbd></span><span class="cv">Center cursor on screen</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>zt</kbd></span><span class="cv">Cursor to top of screen</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>zb</kbd></span><span class="cv">Cursor to bottom of screen</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+o</kbd></span><span class="cv">Jump to older position</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+i</kbd></span><span class="cv">Jump to newer position</span></div>
+      </div>
+    </div>
+
+    <!-- Insert -->
+    <div class="cheat-card">
+      <div class="cheat-card-header insert">&#128393; Entering Insert Mode</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>i</kbd></span><span class="cv">Insert before cursor</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>I</kbd></span><span class="cv">Insert at first non-blank</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>a</kbd></span><span class="cv">Append after cursor</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>A</kbd></span><span class="cv">Append at end of line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>o</kbd></span><span class="cv">Open new line below, insert</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>O</kbd></span><span class="cv">Open new line above, insert</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>s</kbd></span><span class="cv">Delete char, insert</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>S</kbd></span><span class="cv">Delete line, insert</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>C</kbd></span><span class="cv">Change to end of line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>R</kbd></span><span class="cv">Enter Replace mode (overtype)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Esc</kbd></span><span class="cv">Return to Normal mode</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+r</kbd> <em>reg</em></span><span class="cv">Paste register in Insert mode</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w</kbd></span><span class="cv">Delete prev word (Insert)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+u</kbd></span><span class="cv">Delete to line start (Insert)</span></div>
+      </div>
+    </div>
+
+    <!-- Operators -->
+    <div class="cheat-card">
+      <div class="cheat-card-header edit">&#9998; Operators + Motions</div>
+      <div class="cheat-card-body">
+        <p style="font-size:0.78rem;color:var(--fg3);margin-bottom:0.5rem;">Combine operator + motion: <code>d</code>+<code>w</code> = delete word. Double = whole line.</p>
+        <table class="op-table">
+          <tr><th>Op</th><th>Name</th><th>Example</th></tr>
+          <tr><td class="op-key"><kbd>d</kbd></td><td>Delete (cut)</td><td><code>dw</code> <code>d$</code> <code>dd</code></td></tr>
+          <tr><td class="op-key"><kbd>y</kbd></td><td>Yank (copy)</td><td><code>yw</code> <code>y3j</code> <code>yy</code></td></tr>
+          <tr><td class="op-key"><kbd>c</kbd></td><td>Change</td><td><code>cw</code> <code>c$</code> <code>cc</code></td></tr>
+          <tr><td class="op-key"><kbd>&gt;</kbd></td><td>Indent →</td><td><code>&gt;&gt;</code> <code>&gt;j</code></td></tr>
+          <tr><td class="op-key"><kbd>&lt;</kbd></td><td>Indent ←</td><td><code>&lt;&lt;</code> <code>&lt;j</code></td></tr>
+          <tr><td class="op-key"><kbd>=</kbd></td><td>Auto-indent</td><td><code>==</code> <code>=G</code></td></tr>
+          <tr><td class="op-key"><kbd>gu</kbd></td><td>Lowercase</td><td><code>guiw</code> <code>guu</code></td></tr>
+          <tr><td class="op-key"><kbd>gU</kbd></td><td>Uppercase</td><td><code>gUiw</code> <code>gUU</code></td></tr>
+          <tr><td class="op-key"><kbd>g~</kbd></td><td>Toggle case</td><td><code>g~iw</code></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Single edits -->
+    <div class="cheat-card">
+      <div class="cheat-card-header edit">&#8855; Single-Key Edits</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>x</kbd></span><span class="cv">Delete char under cursor (fwd)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>X</kbd></span><span class="cv">Delete char before cursor (bwd)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>r</kbd><em>c</em></span><span class="cv">Replace char with c</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>~</kbd></span><span class="cv">Toggle case of char</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>J</kbd></span><span class="cv">Join line below to current</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>D</kbd></span><span class="cv">Delete to end of line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>p</kbd></span><span class="cv">Paste after cursor / line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>P</kbd></span><span class="cv">Paste before cursor / line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>"0p</kbd></span><span class="cv">Paste last yank (not delete)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>u</kbd></span><span class="cv">Undo</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+r</kbd></span><span class="cv">Redo</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>.</kbd></span><span class="cv">Repeat last change</span></div>
+      </div>
+    </div>
+
+    <!-- Text Objects -->
+    <div class="cheat-card">
+      <div class="cheat-card-header edit">&#9641; Text Objects</div>
+      <div class="cheat-card-body">
+        <p style="font-size:0.78rem;color:var(--fg3);margin-bottom:0.5rem;"><kbd>i</kbd> = inner &nbsp;|&nbsp; <kbd>a</kbd> = around (includes delimiter)</p>
+        <div class="cheat-row"><span class="ck"><kbd>iw</kbd> / <kbd>aw</kbd></span><span class="cv">word</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>is</kbd> / <kbd>as</kbd></span><span class="cv">sentence</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>ip</kbd> / <kbd>ap</kbd></span><span class="cv">paragraph</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>i"</kbd> / <kbd>a"</kbd></span><span class="cv">double-quoted string</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>i'</kbd> / <kbd>a'</kbd></span><span class="cv">single-quoted string</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>i`</kbd> / <kbd>a`</kbd></span><span class="cv">backtick string</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>i(</kbd> / <kbd>a(</kbd></span><span class="cv">parentheses</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>i[</kbd> / <kbd>a[</kbd></span><span class="cv">brackets</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>i{</kbd> / <kbd>a{</kbd></span><span class="cv">braces (also <kbd>iB</kbd>/<kbd>aB</kbd>)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>i&lt;</kbd> / <kbd>a&lt;</kbd></span><span class="cv">angle brackets</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>it</kbd> / <kbd>at</kbd></span><span class="cv">HTML/XML tag</span></div>
+        <p style="font-size:0.75rem;color:var(--fg3);margin-top:0.5rem;">Combine: <code>ciw</code> · <code>da{</code> · <code>yip</code> · <code>vat</code></p>
+      </div>
+    </div>
+
+    <!-- Visual -->
+    <div class="cheat-card">
+      <div class="cheat-card-header visual">&#9646; Visual Mode</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>v</kbd></span><span class="cv">Char-wise visual</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>V</kbd></span><span class="cv">Line-wise visual</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+v</kbd></span><span class="cv">Block visual (column)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>gv</kbd></span><span class="cv">Reselect last selection</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>o</kbd></span><span class="cv">Move to other end of selection</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>d</kbd> / <kbd>x</kbd></span><span class="cv">Delete selection</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>y</kbd></span><span class="cv">Yank selection</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>c</kbd></span><span class="cv">Change selection</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>&gt;</kbd> / <kbd>&lt;</kbd></span><span class="cv">Indent / unindent</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>u</kbd> / <kbd>U</kbd></span><span class="cv">Lowercase / uppercase</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>~</kbd></span><span class="cv">Toggle case</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>J</kbd></span><span class="cv">Join selected lines</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:</kbd></span><span class="cv">Enter command for range</span></div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div class="cheat-card">
+      <div class="cheat-card-header search">&#128269; Search &amp; Replace</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>/</kbd><em>pat</em></span><span class="cv">Search forward</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>?</kbd><em>pat</em></span><span class="cv">Search backward</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>n</kbd> / <kbd>N</kbd></span><span class="cv">Next / prev match</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>*</kbd></span><span class="cv">Search word under cursor (fwd)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>#</kbd></span><span class="cv">Search word under cursor (bwd)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:noh</kbd></span><span class="cv">Clear search highlights</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:s/o/n/</kbd></span><span class="cv">Replace first on line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:s/o/n/g</kbd></span><span class="cv">Replace all on line</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:%s/o/n/g</kbd></span><span class="cv">Replace all in file</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:%s/o/n/gc</kbd></span><span class="cv">Replace with confirm</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:'&lt;,'&gt;s/o/n/g</kbd></span><span class="cv">Replace in selection</span></div>
+      </div>
+    </div>
+
+    <!-- Commands -->
+    <div class="cheat-card">
+      <div class="cheat-card-header cmd">&#58; Ex Commands</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>:w</kbd></span><span class="cv">Save file</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:w!</kbd></span><span class="cv">Force save</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:q</kbd></span><span class="cv">Quit</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:q!</kbd></span><span class="cv">Quit without saving</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:wq</kbd> / <kbd>:x</kbd></span><span class="cv">Save and quit</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:e</kbd> <em>file</em></span><span class="cv">Open file</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:e!</kbd></span><span class="cv">Reload (discard changes)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:ls</kbd></span><span class="cv">List buffers</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:bn</kbd> / <kbd>:bp</kbd></span><span class="cv">Next / prev buffer</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:bd</kbd></span><span class="cv">Delete buffer</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:sp</kbd> / <kbd>:vsp</kbd></span><span class="cv">Split horizontal / vertical</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:tabnew</kbd></span><span class="cv">New tab</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:help</kbd> <em>topic</em></span><span class="cv">Open help for topic</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:!</kbd><em>cmd</em></span><span class="cv">Run shell command</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:r !</kbd><em>cmd</em></span><span class="cv">Insert shell output</span></div>
+      </div>
+    </div>
+
+    <!-- Marks & Registers -->
+    <div class="cheat-card">
+      <div class="cheat-card-header adv">&#127381; Marks &amp; Registers</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>m</kbd><em>a</em></span><span class="cv">Set local mark a</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>m</kbd><em>A</em></span><span class="cv">Set global mark A</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>'</kbd><em>a</em></span><span class="cv">Jump to mark a (line)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>`</kbd><em>a</em></span><span class="cv">Jump to mark a (exact)</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>''</kbd></span><span class="cv">Jump to last jump location</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:marks</kbd></span><span class="cv">List all marks</span></div>
+        <div class="cheat-row" style="border-top:1px solid var(--border);margin-top:0.4rem;padding-top:0.4rem;"><span class="ck"><kbd>"</kbd><em>a</em><kbd>yy</kbd></span><span class="cv">Yank into register a</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>"</kbd><em>a</em><kbd>p</kbd></span><span class="cv">Paste from register a</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>"0p</kbd></span><span class="cv">Paste last yank</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>"+y</kbd></span><span class="cv">Copy to system clipboard</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>"+p</kbd></span><span class="cv">Paste from system clipboard</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:reg</kbd></span><span class="cv">Show all registers</span></div>
+      </div>
+    </div>
+
+    <!-- Macros -->
+    <div class="cheat-card">
+      <div class="cheat-card-header adv">&#9654; Macros &amp; Repeat</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>q</kbd><em>a</em></span><span class="cv">Start recording into register a</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>q</kbd></span><span class="cv">Stop recording</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>@</kbd><em>a</em></span><span class="cv">Play macro from register a</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>@@</kbd></span><span class="cv">Replay last macro</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>5@</kbd><em>a</em></span><span class="cv">Play macro 5 times</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:norm @a</kbd></span><span class="cv">Run macro on selected lines</span></div>
+        <div class="cheat-row" style="border-top:1px solid var(--border);margin-top:0.4rem;padding-top:0.4rem;"><span class="ck"><kbd>.</kbd></span><span class="cv">Repeat last change</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>@:</kbd></span><span class="cv">Repeat last Ex command</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>n.</kbd></span><span class="cv">Repeat change n times</span></div>
+      </div>
+    </div>
+
+    <!-- Windows -->
+    <div class="cheat-card">
+      <div class="cheat-card-header nav">&#9641; Windows &amp; Tabs</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w s</kbd></span><span class="cv">Horizontal split</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w v</kbd></span><span class="cv">Vertical split</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w hjkl</kbd></span><span class="cv">Navigate between splits</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w HJKL</kbd></span><span class="cv">Move split direction</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w =</kbd></span><span class="cv">Equalize split sizes</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w _</kbd></span><span class="cv">Maximize height</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w |</kbd></span><span class="cv">Maximize width</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w q</kbd></span><span class="cv">Close window</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+w o</kbd></span><span class="cv">Close all other windows</span></div>
+        <div class="cheat-row" style="border-top:1px solid var(--border);margin-top:0.4rem;padding-top:0.4rem;"><span class="ck"><kbd>gt</kbd> / <kbd>gT</kbd></span><span class="cv">Next / prev tab</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:tabnew</kbd></span><span class="cv">New tab</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:tabclose</kbd></span><span class="cv">Close tab</span></div>
+      </div>
+    </div>
+
+    <!-- LSP -->
+    <div class="cheat-card">
+      <div class="cheat-card-header adv">&#9889; LSP (Neovim built-in)</div>
+      <div class="cheat-card-body">
+        <div class="cheat-row"><span class="ck"><kbd>gd</kbd></span><span class="cv">Go to definition</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>gD</kbd></span><span class="cv">Go to declaration</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>gr</kbd></span><span class="cv">Show references</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>gi</kbd></span><span class="cv">Go to implementation</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>K</kbd></span><span class="cv">Hover documentation</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>&lt;leader&gt;rn</kbd></span><span class="cv">Rename symbol</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>&lt;leader&gt;ca</kbd></span><span class="cv">Code actions</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>[d</kbd> / <kbd>]d</kbd></span><span class="cv">Prev / next diagnostic</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>&lt;leader&gt;e</kbd></span><span class="cv">Show diagnostic float</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:LspInfo</kbd></span><span class="cv">Show active LSP clients</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:Mason</kbd></span><span class="cv">Install language servers</span></div>
+      </div>
+    </div>
+
+  </div><!-- end cheat-grid -->
+
+  <!-- COUNTS -->
+  <div class="section-h2">&#35; Counts &amp; Repetition</div>
+  <div class="callout tip">
+    <strong>Any command can be prefixed with a count:</strong>
+    <code>3j</code> = down 3 lines &nbsp;|&nbsp;
+    <code>5dw</code> = delete 5 words &nbsp;|&nbsp;
+    <code>10@a</code> = macro 10 times &nbsp;|&nbsp;
+    <code>2yy</code> = yank 2 lines &nbsp;|&nbsp;
+    <code>4&gt;&gt;</code> = indent 4 lines
+  </div>
+
+  <!-- OPERATOR CHEATSHEET -->
+  <div class="section-h2">&#9642; Operator + Motion Quick Reference</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.5rem;margin-bottom:2rem;font-size:0.83rem;">
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem;">
+      <div style="color:var(--teal);font-weight:700;margin-bottom:0.4rem;">Delete</div>
+      <code>dd</code> line &nbsp; <code>dw</code> word &nbsp; <code>d$</code> to EOL<br>
+      <code>dgg</code> to top &nbsp; <code>dG</code> to bottom<br>
+      <code>d2j</code> 3 lines &nbsp; <code>dip</code> paragraph
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem;">
+      <div style="color:var(--teal);font-weight:700;margin-bottom:0.4rem;">Change</div>
+      <code>ciw</code> inner word &nbsp; <code>ci"</code> in quotes<br>
+      <code>ct,</code> change to comma &nbsp; <code>C</code> to EOL<br>
+      <code>cip</code> paragraph
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem;">
+      <div style="color:var(--teal);font-weight:700;margin-bottom:0.4rem;">Yank</div>
+      <code>yy</code> line &nbsp; <code>yiw</code> word &nbsp; <code>y$</code> to EOL<br>
+      <code>yip</code> paragraph &nbsp; <code>y3j</code> 4 lines<br>
+      <code>yi{</code> inside braces
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem;">
+      <div style="color:var(--teal);font-weight:700;margin-bottom:0.4rem;">Indent</div>
+      <code>&gt;&gt;</code> line &nbsp; <code>&lt;&lt;</code> unindent<br>
+      <code>&gt;3j</code> 4 lines &nbsp; <code>=G</code> to bottom<br>
+      Visual: <kbd>V</kbd> select then <kbd>&gt;</kbd>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Neovim Guide &mdash; <a href="https://neovim.io" target="_blank">neovim.io</a> &mdash; <a href="practice.html">Practice Now</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Guide — Interactive Practice</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    html, body { height: 100%; overflow: hidden; }
+    body { display: flex; flex-direction: column; }
+
+    .practice-layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── SIDEBAR ─────────────────────────── */
+    .sidebar {
+      width: 270px;
+      min-width: 270px;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-tab {
+      flex: 1;
+      padding: 0.55rem;
+      text-align: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--fg3);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 2px solid transparent;
+      transition: all 0.12s;
+      user-select: none;
+    }
+    .sidebar-tab:hover { color: var(--fg2); }
+    .sidebar-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* Progress */
+    .progress-bar-wrap {
+      padding: 0.6rem 0.75rem 0.5rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .progress-bar-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--fg3);
+      margin-bottom: 0.3rem;
+    }
+    .progress-bar-track {
+      height: 4px;
+      background: var(--bg4);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+
+    .sidebar-content {
+      overflow-y: auto;
+      flex: 1;
+      padding: 0.6rem 0.6rem 1rem;
+    }
+
+    .exercise-item {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.6rem 0.8rem;
+      margin-bottom: 0.4rem;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .exercise-item:hover { border-color: var(--fg3); }
+    .exercise-item.active { border-color: var(--accent); background: rgba(122,162,247,0.07); }
+    .exercise-item.completed { border-color: var(--green); }
+
+    .exercise-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--fg);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .exercise-title .num { color: var(--fg3); font-weight: 400; font-size: 0.75rem; }
+    .exercise-title .check { color: var(--green); }
+    .exercise-desc { font-size: 0.75rem; color: var(--fg3); margin-top: 0.15rem; }
+
+    .ref-section { margin-bottom: 0.9rem; }
+    .ref-section-title {
+      font-size: 0.66rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--fg3);
+      margin-bottom: 0.3rem;
+      padding-left: 0.1rem;
+    }
+    .ref-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.2rem 0.3rem;
+      border-radius: 3px;
+      font-size: 0.78rem;
+    }
+    .ref-row:hover { background: var(--bg3); }
+    .ref-key { color: var(--orange); white-space: nowrap; }
+    .ref-desc { color: var(--fg2); font-size: 0.73rem; }
+
+    /* ── EDITOR AREA ─────────────────────── */
+    .editor-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .editor-topbar {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      padding: 0.4rem 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 1rem;
+    }
+
+    .editor-filename {
+      color: var(--fg2);
+      font-size: 0.82rem;
+    }
+
+    .editor-task {
+      flex: 1;
+      font-size: 0.8rem;
+      color: var(--fg3);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .editor-btns { display: flex; gap: 0.4rem; flex-shrink: 0; }
+    .ctrl-btn {
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--fg2);
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.28rem 0.65rem;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .ctrl-btn:hover { background: var(--bg2); color: var(--fg); border-color: var(--fg3); }
+
+    /* ── THE EDITOR ──────────────────────── */
+    #vim-editor {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg);
+      cursor: text;
+      outline: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #editor-lines {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.3rem 0;
+      font-size: 14px;
+      line-height: 21px;
+    }
+
+    .editor-line {
+      display: flex;
+      min-height: 21px;
+    }
+    .line-number {
+      color: var(--fg3);
+      text-align: right;
+      padding: 0 0.7rem 0 0.4rem;
+      min-width: 38px;
+      user-select: none;
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+    .cursor-line .line-number { color: var(--fg2); }
+    .line-content {
+      flex: 1;
+      white-space: pre;
+      padding-right: 1rem;
+      tab-size: 2;
+      font-size: 14px;
+    }
+    .cursor-line .line-content { background: rgba(255,255,255,0.035); }
+
+    .char-cursor {
+      background: var(--fg);
+      color: var(--bg2);
+      border-radius: 1px;
+    }
+    .char-cursor.insert-cursor {
+      background: transparent;
+      color: inherit;
+      border-left: 2px solid var(--green);
+      margin-left: -1px;
+    }
+    .char-selected {
+      background: rgba(122,162,247,0.25);
+      color: var(--accent2);
+    }
+
+    /* ── STATUS / CMD ────────────────────── */
+    #statusline {
+      background: var(--accent);
+      color: var(--bg);
+      padding: 0.18rem 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      min-height: 24px;
+      letter-spacing: 0.02em;
+    }
+    #statusline.insert-mode  { background: var(--green); }
+    #statusline.visual-mode  { background: var(--accent2); }
+    #statusline.command-mode { background: var(--yellow); }
+    #statusline.replace-mode { background: var(--red); }
+    .status-right { font-weight: 400; opacity: 0.8; }
+
+    #cmdline-wrap {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 0.2rem 0.8rem;
+      font-size: 0.85rem;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      color: var(--fg);
+      flex-shrink: 0;
+    }
+
+    /* ── TASK PANEL ──────────────────────── */
+    .task-panel {
+      background: var(--bg3);
+      border-top: 1px solid var(--border);
+      padding: 0.55rem 1rem;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+    }
+    .task-panel-label {
+      font-size: 0.66rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg3);
+      margin-bottom: 0.25rem;
+    }
+    .goal-label  { color: var(--teal); font-weight: 700; }
+    .hint-label  { color: var(--yellow); }
+
+    /* ── SUCCESS FLASH ───────────────────── */
+    .success-flash {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--green);
+      color: var(--bg);
+      padding: 0.75rem 2.2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .success-flash.show { opacity: 1; }
+
+    /* ── KEY HINT BADGE ──────────────────── */
+    .key-press-display {
+      position: absolute;
+      bottom: 0.5rem;
+      right: 0.8rem;
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--orange);
+      opacity: 0;
+      transition: opacity 0.15s;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .key-press-display.visible { opacity: 1; }
+
+    @media (max-width: 700px) {
+      .sidebar { width: 200px; min-width: 180px; }
+      .editor-topbar .editor-task { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="index.html">Basics</a></li>
+    <li><a href="advanced.html">Advanced</a></li>
+    <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+    <li><a href="practice.html" class="active">Practice</a></li>
+  </ul>
+</nav>
+
+<div class="practice-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-tabs">
+      <div class="sidebar-tab active" data-tab="exercises" onclick="switchTab('exercises')">Exercises</div>
+      <div class="sidebar-tab" data-tab="reference"  onclick="switchTab('reference')">Reference</div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-row">
+        <span>Progress</span>
+        <span id="progress-label">0/13</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+    </div>
+
+    <!-- EXERCISES TAB -->
+    <div class="sidebar-content" id="tab-exercises">
+      <div id="exercise-list"></div>
+    </div>
+
+    <!-- REFERENCE TAB -->
+    <div class="sidebar-content" id="tab-reference" style="display:none;">
+      <div class="ref-section">
+        <div class="ref-section-title">Movement</div>
+        <div class="ref-row"><span class="ref-key">h j k l</span><span class="ref-desc">← ↓ ↑ →</span></div>
+        <div class="ref-row"><span class="ref-key">w / b</span><span class="ref-desc">next / prev word</span></div>
+        <div class="ref-row"><span class="ref-key">e / ge</span><span class="ref-desc">word end fwd / bwd</span></div>
+        <div class="ref-row"><span class="ref-key">0 ^ $</span><span class="ref-desc">line start / nbk / end</span></div>
+        <div class="ref-row"><span class="ref-key">gg / G</span><span class="ref-desc">file top / bottom</span></div>
+        <div class="ref-row"><span class="ref-key">f{c} t{c}</span><span class="ref-desc">jump to / before char</span></div>
+        <div class="ref-row"><span class="ref-key">; / ,</span><span class="ref-desc">repeat f/t fwd / bwd</span></div>
+        <div class="ref-row"><span class="ref-key">%</span><span class="ref-desc">matching bracket</span></div>
+        <div class="ref-row"><span class="ref-key">Ctrl+d / u</span><span class="ref-desc">half page ↓ / ↑</span></div>
+        <div class="ref-row"><span class="ref-key">H M L</span><span class="ref-desc">screen top/mid/bottom</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-section-title">Insert Mode</div>
+        <div class="ref-row"><span class="ref-key">i / a</span><span class="ref-desc">insert / append</span></div>
+        <div class="ref-row"><span class="ref-key">I / A</span><span class="ref-desc">line start / end</span></div>
+        <div class="ref-row"><span class="ref-key">o / O</span><span class="ref-desc">line below / above</span></div>
+        <div class="ref-row"><span class="ref-key">s / S</span><span class="ref-desc">sub char / line</span></div>
+        <div class="ref-row"><span class="ref-key">Esc</span><span class="ref-desc">back to Normal</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-section-title">Operators</div>
+        <div class="ref-row"><span class="ref-key">d / D</span><span class="ref-desc">delete / to EOL</span></div>
+        <div class="ref-row"><span class="ref-key">y / Y</span><span class="ref-desc">yank / line</span></div>
+        <div class="ref-row"><span class="ref-key">c / C</span><span class="ref-desc">change / to EOL</span></div>
+        <div class="ref-row"><span class="ref-key">dd / yy / cc</span><span class="ref-desc">operate on line</span></div>
+        <div class="ref-row"><span class="ref-key">&gt; / &lt;</span><span class="ref-desc">indent / unindent</span></div>
+        <div class="ref-row"><span class="ref-key">= / ==</span><span class="ref-desc">auto-indent</span></div>
+        <div class="ref-row"><span class="ref-key">x / X</span><span class="ref-desc">del char fwd / bwd</span></div>
+        <div class="ref-row"><span class="ref-key">r{c}</span><span class="ref-desc">replace char</span></div>
+        <div class="ref-row"><span class="ref-key">~</span><span class="ref-desc">toggle case</span></div>
+        <div class="ref-row"><span class="ref-key">J</span><span class="ref-desc">join lines</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-section-title">Text Objects</div>
+        <div class="ref-row"><span class="ref-key">iw / aw</span><span class="ref-desc">inner / around word</span></div>
+        <div class="ref-row"><span class="ref-key">is / ip</span><span class="ref-desc">sentence / paragraph</span></div>
+        <div class="ref-row"><span class="ref-key">i" / i'</span><span class="ref-desc">inside quotes</span></div>
+        <div class="ref-row"><span class="ref-key">i( / i{</span><span class="ref-desc">inside () {}</span></div>
+        <div class="ref-row"><span class="ref-key">a( / a{</span><span class="ref-desc">around () {}</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-section-title">Visual</div>
+        <div class="ref-row"><span class="ref-key">v / V</span><span class="ref-desc">char / line visual</span></div>
+        <div class="ref-row"><span class="ref-key">d y c</span><span class="ref-desc">delete/yank/change sel</span></div>
+        <div class="ref-row"><span class="ref-key">&gt; &lt; =</span><span class="ref-desc">indent sel</span></div>
+        <div class="ref-row"><span class="ref-key">u / U</span><span class="ref-desc">lower / uppercase sel</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-section-title">Paste &amp; Undo</div>
+        <div class="ref-row"><span class="ref-key">p / P</span><span class="ref-desc">paste after / before</span></div>
+        <div class="ref-row"><span class="ref-key">u / Ctrl+r</span><span class="ref-desc">undo / redo</span></div>
+        <div class="ref-row"><span class="ref-key">.</span><span class="ref-desc">repeat last change</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-section-title">Search</div>
+        <div class="ref-row"><span class="ref-key">/{pat} Enter</span><span class="ref-desc">search forward</span></div>
+        <div class="ref-row"><span class="ref-key">?{pat} Enter</span><span class="ref-desc">search backward</span></div>
+        <div class="ref-row"><span class="ref-key">n / N</span><span class="ref-desc">next / prev match</span></div>
+        <div class="ref-row"><span class="ref-key">* / #</span><span class="ref-desc">search word under cursor</span></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-section-title">Macros</div>
+        <div class="ref-row"><span class="ref-key">q{a} … q</span><span class="ref-desc">record into register a</span></div>
+        <div class="ref-row"><span class="ref-key">@{a}</span><span class="ref-desc">replay macro a</span></div>
+        <div class="ref-row"><span class="ref-key">@@</span><span class="ref-desc">replay last macro</span></div>
+        <div class="ref-row"><span class="ref-key">5@a</span><span class="ref-desc">replay 5 times</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="editor-area">
+    <div class="editor-topbar">
+      <span class="editor-filename" id="editor-filename">scratch.txt</span>
+      <span class="editor-task" id="editor-task-short"></span>
+      <div class="editor-btns">
+        <button class="ctrl-btn" onclick="resetExercise()">Reset</button>
+        <button class="ctrl-btn" onclick="showHint()">Hint</button>
+        <button class="ctrl-btn" onclick="skipExercise()">Skip →</button>
+      </div>
+    </div>
+
+    <div id="vim-editor" tabindex="0">
+      <div id="editor-lines"></div>
+      <div class="success-flash" id="success-flash">✓ Goal reached!</div>
+      <div class="key-press-display" id="key-display"></div>
+    </div>
+
+    <div id="statusline">
+      <span id="status-mode">NORMAL</span>
+      <span class="status-right" id="status-pos">1:1</span>
+    </div>
+
+    <div id="cmdline-wrap">
+      <span id="cmdline-text"></span>
+    </div>
+
+    <div class="task-panel">
+      <div class="task-panel-label">Exercise Goal</div>
+      <div id="task-instruction"></div>
+    </div>
+  </div>
+</div>
+
+<script src="practice.js"></script>
+<script>
+  // Build exercise list dynamically
+  (function buildList() {
+    const list = document.getElementById('exercise-list');
+    EXERCISES.forEach((ex, i) => {
+      const div = document.createElement('div');
+      div.className = 'exercise-item' + (i === 0 ? ' active' : '');
+      div.dataset.ex = i;
+      div.onclick = () => loadExercise(i);
+      div.innerHTML = `<div class="exercise-title"><span class="num">${String(i+1).padStart(2,'0')}</span> ${ex.title}</div>`
+                    + `<div class="exercise-desc">${ex.goal.replace(/<[^>]+>/g,'')}</div>`;
+      list.appendChild(div);
+    });
+  })();
+
+  // Key display badge
+  const origHandle = handleKey;
+  document.getElementById('vim-editor').addEventListener('keydown', function(e) {
+    if (e.metaKey) return;
+    if (e.ctrlKey && !['d','u','f','b','r','v','['].includes(e.key.toLowerCase())) return;
+    const display = document.getElementById('key-display');
+    let label = '';
+    if (e.ctrlKey) label = 'Ctrl+' + e.key.toUpperCase();
+    else if (e.key === 'Escape') label = 'Esc';
+    else if (e.key === 'Enter') label = 'Enter';
+    else if (e.key === 'Backspace') label = 'BS';
+    else label = e.key;
+    display.textContent = label;
+    display.classList.add('visible');
+    clearTimeout(display._t);
+    display._t = setTimeout(() => display.classList.remove('visible'), 800);
+  }, true); // capture phase so we see it before handleKey
+</script>
+</body>
+</html>

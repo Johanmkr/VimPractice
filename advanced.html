@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Guide — Advanced Features</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .toc {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem 1.4rem;
+      margin-bottom: 2.5rem;
+      display: inline-block;
+      min-width: 260px;
+    }
+    .toc-title {
+      color: var(--fg3);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.8rem;
+    }
+    .toc a {
+      display: block;
+      color: var(--fg2);
+      text-decoration: none;
+      font-size: 0.875rem;
+      padding: 0.2rem 0;
+      transition: color 0.1s;
+    }
+    .toc a:hover { color: var(--accent); }
+    .toc a::before { content: "# "; color: var(--fg3); }
+    .sub-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1rem 1.2rem;
+      margin-top: 1rem;
+    }
+    .sub-card-title {
+      color: var(--teal);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 0.7rem;
+    }
+    .lua-block {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent2);
+      border-radius: 0 6px 6px 0;
+      padding: 1rem 1.2rem;
+      font-size: 0.82rem;
+      overflow-x: auto;
+      margin: 0.8rem 0;
+    }
+    .lua-kw { color: var(--accent2); }
+    .lua-fn { color: var(--accent); }
+    .lua-str { color: var(--green); }
+    .lua-comment { color: var(--fg3); font-style: italic; }
+    .lua-num { color: var(--orange); }
+    .config-path {
+      display: inline-block;
+      background: var(--bg4);
+      border-radius: 4px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.82rem;
+      color: var(--yellow);
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="index.html">Basics</a></li>
+    <li><a href="advanced.html" class="active">Advanced</a></li>
+    <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+    <li><a href="practice.html">Practice</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <h1>&#9889; Advanced Neovim Features</h1>
+    <p>LSP, Lua config, macros, registers, marks, and more — going beyond basics.</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <a href="#registers">Registers</a>
+    <a href="#marks">Marks</a>
+    <a href="#macros">Macros</a>
+    <a href="#textobjects">Text Objects</a>
+    <a href="#windows">Windows & Tabs</a>
+    <a href="#lsp">LSP</a>
+    <a href="#lua">Lua Config</a>
+    <a href="#plugins">Plugin System</a>
+    <a href="#treesitter">Treesitter</a>
+    <a href="#telescope">Telescope</a>
+    <a href="#autocmds">Autocmds</a>
+    <a href="#terminal">Terminal Mode</a>
+  </div>
+
+  <!-- REGISTERS -->
+  <div class="feature-section" id="registers">
+    <h2>&#127381; Registers <span class="tag-label">Normal / Visual</span></h2>
+    <p>Registers are named storage slots for text. Access them with <kbd>"</kbd> followed by the register name before an operator.</p>
+    <div class="two-col">
+      <div>
+        <div class="sub-card">
+          <div class="sub-card-title">Named Registers (a–z)</div>
+          <table class="key-table">
+            <tr><td><kbd>"ayy</kbd></td><td class="key-desc">Yank line into register a</td></tr>
+            <tr><td><kbd>"ap</kbd></td><td class="key-desc">Paste from register a</td></tr>
+            <tr><td><kbd>"Ayy</kbd></td><td class="key-desc">Append yank to register A</td></tr>
+          </table>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">Special Registers</div>
+          <table class="key-table">
+            <tr><td><kbd>"0</kbd></td><td class="key-desc">Last yank</td></tr>
+            <tr><td><kbd>"1–"9</kbd></td><td class="key-desc">Delete history</td></tr>
+            <tr><td><kbd>""</kbd></td><td class="key-desc">Default (unnamed)</td></tr>
+            <tr><td><kbd>"+</kbd></td><td class="key-desc">System clipboard</td></tr>
+            <tr><td><kbd>"*</kbd></td><td class="key-desc">Primary selection (X11)</td></tr>
+            <tr><td><kbd>"/</kbd></td><td class="key-desc">Last search pattern</td></tr>
+            <tr><td><kbd>".</kbd></td><td class="key-desc">Last inserted text</td></tr>
+            <tr><td><kbd>"%</kbd></td><td class="key-desc">Current filename</td></tr>
+            <tr><td><kbd>":</kbd></td><td class="key-desc">Last Ex command</td></tr>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="sub-card">
+          <div class="sub-card-title">Using in Insert / Command Mode</div>
+          <table class="key-table">
+            <tr><td><kbd>Ctrl</kbd>+<kbd>r a</kbd></td><td class="key-desc">Paste register a while in Insert</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>r +</kbd></td><td class="key-desc">Paste clipboard in Insert</td></tr>
+            <tr><td><kbd>:reg</kbd></td><td class="key-desc">List all registers</td></tr>
+            <tr><td><kbd>:reg a b</kbd></td><td class="key-desc">Show registers a and b</td></tr>
+          </table>
+        </div>
+        <div class="callout tip">
+          <strong>Tip:</strong> Always use <kbd>"0p</kbd> to paste from your last yank, so deletes don't clobber it.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKS -->
+  <div class="feature-section" id="marks">
+    <h2>&#127989; Marks <span class="tag-label">Normal</span></h2>
+    <p>Marks let you bookmark locations in files and jump back instantly.</p>
+    <div class="two-col">
+      <div class="sub-card">
+        <div class="sub-card-title">Setting &amp; Jumping</div>
+        <table class="key-table">
+          <tr><td><kbd>m{a-z}</kbd></td><td class="key-desc">Set local mark (per file)</td></tr>
+          <tr><td><kbd>m{A-Z}</kbd></td><td class="key-desc">Set global mark (cross-file)</td></tr>
+          <tr><td><kbd>'{mark}</kbd></td><td class="key-desc">Jump to mark line</td></tr>
+          <tr><td><kbd>`{mark}</kbd></td><td class="key-desc">Jump to exact mark position</td></tr>
+          <tr><td><kbd>''</kbd></td><td class="key-desc">Jump to last jump location</td></tr>
+          <tr><td><kbd>`.</kbd></td><td class="key-desc">Jump to last edit location</td></tr>
+          <tr><td><kbd>`[</kbd> / <kbd>`]</kbd></td><td class="key-desc">Start/end of last change</td></tr>
+          <tr><td><kbd>`&lt;</kbd> / <kbd>`&gt;</kbd></td><td class="key-desc">Start/end of last visual</td></tr>
+          <tr><td><kbd>:marks</kbd></td><td class="key-desc">List all marks</td></tr>
+          <tr><td><kbd>:delmarks a</kbd></td><td class="key-desc">Delete mark a</td></tr>
+        </table>
+      </div>
+      <div class="sub-card">
+        <div class="sub-card-title">Jump List &amp; Change List</div>
+        <table class="key-table">
+          <tr><td><kbd>Ctrl</kbd>+<kbd>o</kbd></td><td class="key-desc">Go to older jump position</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>i</kbd></td><td class="key-desc">Go to newer jump position</td></tr>
+          <tr><td><kbd>g;</kbd></td><td class="key-desc">Go to older change position</td></tr>
+          <tr><td><kbd>g,</kbd></td><td class="key-desc">Go to newer change position</td></tr>
+          <tr><td><kbd>:jumps</kbd></td><td class="key-desc">Show jump list</td></tr>
+          <tr><td><kbd>:changes</kbd></td><td class="key-desc">Show change list</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MACROS -->
+  <div class="feature-section" id="macros">
+    <h2>&#9654; Macros <span class="tag-label">Normal</span></h2>
+    <p>Record a sequence of commands and replay them. Essential for repetitive bulk edits.</p>
+    <div class="two-col">
+      <div class="sub-card">
+        <div class="sub-card-title">Recording &amp; Playing</div>
+        <table class="key-table">
+          <tr><td><kbd>q{a-z}</kbd></td><td class="key-desc">Start recording into register</td></tr>
+          <tr><td><kbd>q</kbd></td><td class="key-desc">Stop recording</td></tr>
+          <tr><td><kbd>@{a-z}</kbd></td><td class="key-desc">Play macro</td></tr>
+          <tr><td><kbd>@@</kbd></td><td class="key-desc">Replay last macro</td></tr>
+          <tr><td><kbd>5@a</kbd></td><td class="key-desc">Play macro a 5 times</td></tr>
+          <tr><td><kbd>:norm @a</kbd></td><td class="key-desc">Run macro on each line</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="callout">
+          <strong>Workflow:</strong> Position cursor at start → <kbd>qa</kbd> → make your edits → <kbd>q</kbd> → move to next item → <kbd>@a</kbd>. Use <kbd>100@a</kbd> to run it 100 times (it stops at errors).
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">Editing a Macro</div>
+          <table class="key-table">
+            <tr><td><kbd>:let @a='</kbd></td><td class="key-desc">Edit macro a directly</td></tr>
+            <tr><td><kbd>"ap</kbd></td><td class="key-desc">Paste macro to edit in buffer</td></tr>
+            <tr><td><kbd>"ayy</kbd></td><td class="key-desc">Yank edited macro back</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEXT OBJECTS -->
+  <div class="feature-section" id="textobjects">
+    <h2>&#9641; Text Objects <span class="tag-label">Operator + Object</span></h2>
+    <p>Text objects let you operate on semantic units: words, sentences, blocks, and delimiters. Used as the motion part of an operator.</p>
+    <div class="two-col">
+      <div class="sub-card">
+        <div class="sub-card-title">Inner (i) vs Around (a)</div>
+        <p class="key-desc" style="margin-bottom:0.7rem;font-size:0.8rem;"><strong>i</strong> = content only &nbsp;|&nbsp; <strong>a</strong> = content + surrounding delimiters/whitespace</p>
+        <table class="key-table">
+          <tr><td><kbd>iw</kbd> / <kbd>aw</kbd></td><td class="key-desc">Word</td></tr>
+          <tr><td><kbd>is</kbd> / <kbd>as</kbd></td><td class="key-desc">Sentence</td></tr>
+          <tr><td><kbd>ip</kbd> / <kbd>ap</kbd></td><td class="key-desc">Paragraph</td></tr>
+          <tr><td><kbd>i"</kbd> / <kbd>a"</kbd></td><td class="key-desc">Double-quoted string</td></tr>
+          <tr><td><kbd>i'</kbd> / <kbd>a'</kbd></td><td class="key-desc">Single-quoted string</td></tr>
+          <tr><td><kbd>i`</kbd> / <kbd>a`</kbd></td><td class="key-desc">Backtick string</td></tr>
+          <tr><td><kbd>i(</kbd> / <kbd>a(</kbd></td><td class="key-desc">Parentheses</td></tr>
+          <tr><td><kbd>i[</kbd> / <kbd>a[</kbd></td><td class="key-desc">Brackets</td></tr>
+          <tr><td><kbd>i{</kbd> / <kbd>a{</kbd></td><td class="key-desc">Braces</td></tr>
+          <tr><td><kbd>it</kbd> / <kbd>at</kbd></td><td class="key-desc">HTML/XML tag</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="callout tip">
+          <strong>Examples:</strong><br>
+          <kbd>ci"</kbd> — change content inside quotes<br>
+          <kbd>da{</kbd> — delete block including braces<br>
+          <kbd>yip</kbd> — yank current paragraph<br>
+          <kbd>vat</kbd> — visually select around HTML tag<br>
+          <kbd>2i(</kbd> — operate on 2nd level parens
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">Neovim Treesitter Text Objects <span class="tag-label">plugin</span></div>
+          <p class="key-desc" style="font-size:0.8rem;">With <code>nvim-treesitter-textobjects</code>, you get syntax-aware objects:</p>
+          <table class="key-table">
+            <tr><td><kbd>if</kbd></td><td class="key-desc">Inner function body</td></tr>
+            <tr><td><kbd>af</kbd></td><td class="key-desc">Around function (with signature)</td></tr>
+            <tr><td><kbd>ic</kbd></td><td class="key-desc">Inner class</td></tr>
+            <tr><td><kbd>ia</kbd></td><td class="key-desc">Inner argument/parameter</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WINDOWS & TABS -->
+  <div class="feature-section" id="windows">
+    <h2>&#9641; Windows &amp; Tabs <span class="tag-label">Normal</span></h2>
+    <div class="two-col">
+      <div class="sub-card">
+        <div class="sub-card-title">Splits</div>
+        <table class="key-table">
+          <tr><td><kbd>:sp</kbd></td><td class="key-desc">Horizontal split</td></tr>
+          <tr><td><kbd>:vsp</kbd></td><td class="key-desc">Vertical split</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w s</kbd></td><td class="key-desc">Horizontal split</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w v</kbd></td><td class="key-desc">Vertical split</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w h/j/k/l</kbd></td><td class="key-desc">Navigate splits</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w H/J/K/L</kbd></td><td class="key-desc">Move split direction</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w =</kbd></td><td class="key-desc">Equalize split sizes</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w _</kbd></td><td class="key-desc">Maximize height</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w |</kbd></td><td class="key-desc">Maximize width</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w q</kbd></td><td class="key-desc">Close split</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w o</kbd></td><td class="key-desc">Close all other splits</td></tr>
+        </table>
+      </div>
+      <div class="sub-card">
+        <div class="sub-card-title">Tabs</div>
+        <table class="key-table">
+          <tr><td><kbd>:tabnew</kbd></td><td class="key-desc">Open new tab</td></tr>
+          <tr><td><kbd>:tabn</kbd></td><td class="key-desc">Next tab</td></tr>
+          <tr><td><kbd>:tabp</kbd></td><td class="key-desc">Previous tab</td></tr>
+          <tr><td><kbd>gt</kbd></td><td class="key-desc">Next tab (normal mode)</td></tr>
+          <tr><td><kbd>gT</kbd></td><td class="key-desc">Previous tab</td></tr>
+          <tr><td><kbd>:tabclose</kbd></td><td class="key-desc">Close current tab</td></tr>
+          <tr><td><kbd>:tabonly</kbd></td><td class="key-desc">Close all other tabs</td></tr>
+          <tr><td><kbd>:tabs</kbd></td><td class="key-desc">List all tabs</td></tr>
+        </table>
+        <div class="sub-card" style="margin-top:0.8rem;">
+          <div class="sub-card-title">Buffers</div>
+          <table class="key-table">
+            <tr><td><kbd>:ls</kbd></td><td class="key-desc">List buffers</td></tr>
+            <tr><td><kbd>:bn</kbd> / <kbd>:bp</kbd></td><td class="key-desc">Next/prev buffer</td></tr>
+            <tr><td><kbd>:b{n}</kbd></td><td class="key-desc">Go to buffer n</td></tr>
+            <tr><td><kbd>:bd</kbd></td><td class="key-desc">Delete (close) buffer</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LSP -->
+  <div class="feature-section" id="lsp">
+    <h2>&#9889; LSP (Language Server Protocol) <span class="tag-label">neovim native</span></h2>
+    <p>Neovim has built-in LSP support since 0.5. Configure with <code>vim.lsp</code> APIs or use <code>nvim-lspconfig</code> for easy setup.</p>
+    <div class="two-col">
+      <div class="sub-card">
+        <div class="sub-card-title">Default LSP Keymaps</div>
+        <table class="key-table">
+          <tr><td><kbd>gd</kbd></td><td class="key-desc">Go to definition</td></tr>
+          <tr><td><kbd>gD</kbd></td><td class="key-desc">Go to declaration</td></tr>
+          <tr><td><kbd>gr</kbd></td><td class="key-desc">Show references</td></tr>
+          <tr><td><kbd>gi</kbd></td><td class="key-desc">Go to implementation</td></tr>
+          <tr><td><kbd>K</kbd></td><td class="key-desc">Hover documentation</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>k</kbd></td><td class="key-desc">Signature help</td></tr>
+          <tr><td><kbd>&lt;leader&gt;rn</kbd></td><td class="key-desc">Rename symbol</td></tr>
+          <tr><td><kbd>&lt;leader&gt;ca</kbd></td><td class="key-desc">Code actions</td></tr>
+          <tr><td><kbd>[d</kbd> / <kbd>]d</kbd></td><td class="key-desc">Prev/next diagnostic</td></tr>
+          <tr><td><kbd>&lt;leader&gt;e</kbd></td><td class="key-desc">Show diagnostic float</td></tr>
+          <tr><td><kbd>:LspInfo</kbd></td><td class="key-desc">Show active LSP clients</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="sub-card">
+          <div class="sub-card-title">Minimal nvim-lspconfig Setup (Lua)</div>
+          <div class="lua-block">
+<span class="lua-kw">local</span> lspconfig = <span class="lua-fn">require</span>(<span class="lua-str">'lspconfig'</span>)<br><br>
+<span class="lua-comment">-- TypeScript / JavaScript</span><br>
+lspconfig.<span class="lua-fn">ts_ls.setup</span>({})<br><br>
+<span class="lua-comment">-- Python</span><br>
+lspconfig.<span class="lua-fn">pyright.setup</span>({})<br><br>
+<span class="lua-comment">-- Rust</span><br>
+lspconfig.<span class="lua-fn">rust_analyzer.setup</span>({})<br><br>
+<span class="lua-comment">-- Lua (for Neovim config)</span><br>
+lspconfig.<span class="lua-fn">lua_ls.setup</span>({<br>
+&nbsp;&nbsp;settings = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Lua = { globals = { <span class="lua-str">'vim'</span> } }<br>
+&nbsp;&nbsp;}<br>
+})
+          </div>
+        </div>
+        <div class="callout tip">
+          <strong>Tip:</strong> Use <code>mason.nvim</code> to automatically install language servers with <kbd>:Mason</kbd>.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LUA CONFIG -->
+  <div class="feature-section" id="lua">
+    <h2>&#127760; Lua Configuration <span class="tag-label">neovim native</span></h2>
+    <p>Neovim uses Lua as its primary configuration language (as of 0.5+). Your config lives at:</p>
+    <div class="config-path">~/.config/nvim/init.lua</div>
+    <p>Or as a structured module:</p>
+    <div class="config-path">~/.config/nvim/lua/</div>
+    <div class="two-col">
+      <div class="sub-card">
+        <div class="sub-card-title">Setting Options</div>
+        <div class="lua-block">
+<span class="lua-comment">-- vim.opt is the modern API</span><br>
+vim.opt.number = <span class="lua-kw">true</span><br>
+vim.opt.relativenumber = <span class="lua-kw">true</span><br>
+vim.opt.tabstop = <span class="lua-num">2</span><br>
+vim.opt.shiftwidth = <span class="lua-num">2</span><br>
+vim.opt.expandtab = <span class="lua-kw">true</span><br>
+vim.opt.smartindent = <span class="lua-kw">true</span><br>
+vim.opt.wrap = <span class="lua-kw">false</span><br>
+vim.opt.hlsearch = <span class="lua-kw">false</span><br>
+vim.opt.incsearch = <span class="lua-kw">true</span><br>
+vim.opt.termguicolors = <span class="lua-kw">true</span><br>
+vim.opt.scrolloff = <span class="lua-num">8</span><br>
+vim.opt.signcolumn = <span class="lua-str">"yes"</span><br>
+vim.opt.updatetime = <span class="lua-num">50</span>
+        </div>
+      </div>
+      <div class="sub-card">
+        <div class="sub-card-title">Keymaps</div>
+        <div class="lua-block">
+<span class="lua-comment">-- vim.keymap.set(mode, keys, action, opts)</span><br>
+<span class="lua-kw">local</span> map = vim.keymap.set<br><br>
+<span class="lua-comment">-- Set leader key</span><br>
+vim.g.mapleader = <span class="lua-str">" "</span><br><br>
+<span class="lua-comment">-- Navigation</span><br>
+<span class="lua-fn">map</span>(<span class="lua-str">"n"</span>, <span class="lua-str">"&lt;leader&gt;pf"</span>, vim.cmd.Ex)<br><br>
+<span class="lua-comment">-- Move lines in visual</span><br>
+<span class="lua-fn">map</span>(<span class="lua-str">"v"</span>, <span class="lua-str">"J"</span>, <span class="lua-str">":m '&gt;+1&lt;CR&gt;gv=gv"</span>)<br>
+<span class="lua-fn">map</span>(<span class="lua-str">"v"</span>, <span class="lua-str">"K"</span>, <span class="lua-str">":m '&lt;-2&lt;CR&gt;gv=gv"</span>)<br><br>
+<span class="lua-comment">-- Keep cursor centered on scroll</span><br>
+<span class="lua-fn">map</span>(<span class="lua-str">"n"</span>, <span class="lua-str">"&lt;C-d&gt;"</span>, <span class="lua-str">"&lt;C-d&gt;zz"</span>)<br>
+<span class="lua-fn">map</span>(<span class="lua-str">"n"</span>, <span class="lua-str">"&lt;C-u&gt;"</span>, <span class="lua-str">"&lt;C-u&gt;zz"</span>)
+        </div>
+      </div>
+    </div>
+    <div class="sub-card" style="margin-top:1rem;">
+      <div class="sub-card-title">Useful vim.api and vim.fn calls</div>
+      <div class="two-col" style="margin-top:0;">
+        <table class="key-table">
+          <tr><td><code>vim.api.nvim_create_autocmd</code></td><td class="key-desc">Create autocommand</td></tr>
+          <tr><td><code>vim.api.nvim_create_user_command</code></td><td class="key-desc">Create user command</td></tr>
+          <tr><td><code>vim.api.nvim_buf_get_lines</code></td><td class="key-desc">Get buffer lines</td></tr>
+        </table>
+        <table class="key-table">
+          <tr><td><code>vim.fn.expand('%')</code></td><td class="key-desc">Current file name</td></tr>
+          <tr><td><code>vim.fn.getcwd()</code></td><td class="key-desc">Working directory</td></tr>
+          <tr><td><code>vim.notify("msg")</code></td><td class="key-desc">Show notification</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLUGINS -->
+  <div class="feature-section" id="plugins">
+    <h2>&#128268; Plugin System <span class="tag-label">ecosystem</span></h2>
+    <p>The most popular plugin manager is <strong>lazy.nvim</strong>. Plugins are declared as Lua tables with lazy loading support.</p>
+    <div class="sub-card">
+      <div class="sub-card-title">lazy.nvim bootstrap + example</div>
+      <div class="lua-block">
+<span class="lua-comment">-- ~/.config/nvim/init.lua</span><br>
+<span class="lua-kw">local</span> lazypath = vim.fn.<span class="lua-fn">stdpath</span>(<span class="lua-str">"data"</span>) .. <span class="lua-str">"/lazy/lazy.nvim"</span><br>
+<span class="lua-kw">if not</span> vim.loop.<span class="lua-fn">fs_stat</span>(lazypath) <span class="lua-kw">then</span><br>
+&nbsp;&nbsp;vim.fn.<span class="lua-fn">system</span>({ <span class="lua-str">"git"</span>, <span class="lua-str">"clone"</span>, <span class="lua-str">"--filter=blob:none"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="lua-str">"https://github.com/folke/lazy.nvim.git"</span>, lazypath })<br>
+<span class="lua-kw">end</span><br>
+vim.opt.rtp:prepend(lazypath)<br><br>
+<span class="lua-fn">require</span>(<span class="lua-str">"lazy"</span>).<span class="lua-fn">setup</span>({<br>
+&nbsp;&nbsp;<span class="lua-comment">-- Fuzzy finder</span><br>
+&nbsp;&nbsp;{ <span class="lua-str">"nvim-telescope/telescope.nvim"</span>, tag = <span class="lua-str">"0.1.x"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;dependencies = { <span class="lua-str">"nvim-lua/plenary.nvim"</span> } },<br>
+&nbsp;&nbsp;<span class="lua-comment">-- Syntax highlighting</span><br>
+&nbsp;&nbsp;{ <span class="lua-str">"nvim-treesitter/nvim-treesitter"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;build = <span class="lua-str">":TSUpdate"</span> },<br>
+&nbsp;&nbsp;<span class="lua-comment">-- LSP config helpers</span><br>
+&nbsp;&nbsp;{ <span class="lua-str">"neovim/nvim-lspconfig"</span> },<br>
+&nbsp;&nbsp;<span class="lua-comment">-- Completion</span><br>
+&nbsp;&nbsp;{ <span class="lua-str">"hrsh7th/nvim-cmp"</span> },<br>
+})
+      </div>
+    </div>
+    <div class="callout">
+      <strong>Essential plugins:</strong> telescope.nvim · nvim-treesitter · nvim-lspconfig · mason.nvim · nvim-cmp · null-ls / none-ls · gitsigns.nvim · which-key.nvim · lualine.nvim · oil.nvim / nvim-tree
+    </div>
+  </div>
+
+  <!-- TREESITTER -->
+  <div class="feature-section" id="treesitter">
+    <h2>&#127795; Treesitter <span class="tag-label">neovim native (0.9+)</span></h2>
+    <p>Treesitter provides accurate, incremental syntax parsing, enabling better highlighting, indentation, and navigation than regex-based syntax files.</p>
+    <div class="two-col">
+      <div class="sub-card">
+        <div class="sub-card-title">Commands</div>
+        <table class="key-table">
+          <tr><td><kbd>:TSInstall {lang}</kbd></td><td class="key-desc">Install parser for language</td></tr>
+          <tr><td><kbd>:TSInstallInfo</kbd></td><td class="key-desc">Show install status</td></tr>
+          <tr><td><kbd>:TSUpdate</kbd></td><td class="key-desc">Update all parsers</td></tr>
+          <tr><td><kbd>:TSBufToggle highlight</kbd></td><td class="key-desc">Toggle TS highlight</td></tr>
+          <tr><td><kbd>:InspectTree</kbd></td><td class="key-desc">Show syntax tree (Nvim 0.9+)</td></tr>
+        </table>
+      </div>
+      <div class="sub-card">
+        <div class="sub-card-title">Config</div>
+        <div class="lua-block">
+<span class="lua-fn">require</span>(<span class="lua-str">'nvim-treesitter.configs'</span>).<span class="lua-fn">setup</span>({<br>
+&nbsp;&nbsp;ensure_installed = {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="lua-str">"lua"</span>, <span class="lua-str">"python"</span>, <span class="lua-str">"typescript"</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="lua-str">"rust"</span>, <span class="lua-str">"go"</span>, <span class="lua-str">"html"</span>, <span class="lua-str">"css"</span><br>
+&nbsp;&nbsp;},<br>
+&nbsp;&nbsp;highlight = { enable = <span class="lua-kw">true</span> },<br>
+&nbsp;&nbsp;indent = { enable = <span class="lua-kw">true</span> },<br>
+})
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELESCOPE -->
+  <div class="feature-section" id="telescope">
+    <h2>&#128301; Telescope <span class="tag-label">plugin</span></h2>
+    <p>Fuzzy-finder framework for finding anything — files, grep, LSP symbols, git commits, and more.</p>
+    <div class="two-col">
+      <div class="sub-card">
+        <div class="sub-card-title">Common Pickers</div>
+        <table class="key-table">
+          <tr><td><kbd>:Telescope find_files</kbd></td><td class="key-desc">Fuzzy file finder</td></tr>
+          <tr><td><kbd>:Telescope live_grep</kbd></td><td class="key-desc">Search file contents</td></tr>
+          <tr><td><kbd>:Telescope buffers</kbd></td><td class="key-desc">Open buffers</td></tr>
+          <tr><td><kbd>:Telescope oldfiles</kbd></td><td class="key-desc">Recent files</td></tr>
+          <tr><td><kbd>:Telescope git_commits</kbd></td><td class="key-desc">Git commit log</td></tr>
+          <tr><td><kbd>:Telescope lsp_references</kbd></td><td class="key-desc">LSP references</td></tr>
+          <tr><td><kbd>:Telescope keymaps</kbd></td><td class="key-desc">Browse all keymaps</td></tr>
+          <tr><td><kbd>:Telescope help_tags</kbd></td><td class="key-desc">Search help docs</td></tr>
+        </table>
+      </div>
+      <div class="sub-card">
+        <div class="sub-card-title">Telescope Keymaps (in picker)</div>
+        <table class="key-table">
+          <tr><td><kbd>Ctrl</kbd>+<kbd>n</kbd> / <kbd>p</kbd></td><td class="key-desc">Next/prev result</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>x</kbd></td><td class="key-desc">Open in horizontal split</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>v</kbd></td><td class="key-desc">Open in vertical split</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>t</kbd></td><td class="key-desc">Open in new tab</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>q</kbd></td><td class="key-desc">Send all to quickfix</td></tr>
+          <tr><td><kbd>?</kbd></td><td class="key-desc">Show all mappings</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTOCMDS -->
+  <div class="feature-section" id="autocmds">
+    <h2>&#9711; Autocommands <span class="tag-label">Lua API</span></h2>
+    <p>Autocommands run Lua (or Vimscript) in response to editor events.</p>
+    <div class="sub-card">
+      <div class="sub-card-title">Examples</div>
+      <div class="lua-block">
+<span class="lua-kw">local</span> augroup = vim.api.<span class="lua-fn">nvim_create_augroup</span>(<span class="lua-str">"MyGroup"</span>, {})<br><br>
+<span class="lua-comment">-- Highlight on yank</span><br>
+vim.api.<span class="lua-fn">nvim_create_autocmd</span>(<span class="lua-str">"TextYankPost"</span>, {<br>
+&nbsp;&nbsp;group = augroup,<br>
+&nbsp;&nbsp;callback = <span class="lua-kw">function</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;vim.highlight.<span class="lua-fn">on_yank</span>()<br>
+&nbsp;&nbsp;<span class="lua-kw">end</span>,<br>
+})<br><br>
+<span class="lua-comment">-- Remove trailing whitespace on save</span><br>
+vim.api.<span class="lua-fn">nvim_create_autocmd</span>(<span class="lua-str">"BufWritePre"</span>, {<br>
+&nbsp;&nbsp;group = augroup,<br>
+&nbsp;&nbsp;pattern = <span class="lua-str">"*"</span>,<br>
+&nbsp;&nbsp;command = <span class="lua-str">[[%s/\s\+$//e]]</span>,<br>
+})<br><br>
+<span class="lua-comment">-- Format on save (LSP)</span><br>
+vim.api.<span class="lua-fn">nvim_create_autocmd</span>(<span class="lua-str">"BufWritePre"</span>, {<br>
+&nbsp;&nbsp;group = augroup,<br>
+&nbsp;&nbsp;callback = <span class="lua-kw">function</span>() vim.lsp.buf.<span class="lua-fn">format</span>() <span class="lua-kw">end</span>,<br>
+})
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMINAL -->
+  <div class="feature-section" id="terminal">
+    <h2>&#128250; Terminal Mode <span class="tag-label">neovim native</span></h2>
+    <p>Neovim has a built-in terminal emulator — run shells and programs directly in a buffer.</p>
+    <div class="two-col">
+      <div class="sub-card">
+        <div class="sub-card-title">Opening &amp; Using</div>
+        <table class="key-table">
+          <tr><td><kbd>:term</kbd></td><td class="key-desc">Open terminal in current window</td></tr>
+          <tr><td><kbd>:sp | term</kbd></td><td class="key-desc">Terminal in horizontal split</td></tr>
+          <tr><td><kbd>:vsp | term</kbd></td><td class="key-desc">Terminal in vertical split</td></tr>
+          <tr><td><kbd>i</kbd> / <kbd>a</kbd></td><td class="key-desc">Enter terminal (insert) mode</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>\</kbd> <kbd>Ctrl</kbd>+<kbd>n</kbd></td><td class="key-desc">Exit to Normal mode</td></tr>
+          <tr><td><kbd>Ctrl</kbd>+<kbd>w</kbd> + nav</td><td class="key-desc">Switch window from terminal</td></tr>
+        </table>
+      </div>
+      <div class="callout tip">
+        <strong>Tip:</strong> Map <kbd>&lt;C-\&gt;&lt;C-n&gt;</kbd> to something easier:<br>
+        <div class="lua-block" style="margin-top:0.5rem;">
+map(<span class="lua-str">"t"</span>, <span class="lua-str">"&lt;Esc&gt;&lt;Esc&gt;"</span>, <span class="lua-str">"&lt;C-\\&gt;&lt;C-n&gt;"</span>)
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Neovim Guide &mdash; <a href="https://neovim.io" target="_blank">neovim.io</a> &mdash; <a href="practice.html">Practice Now</a></p>
+</footer>
+
+</body>
+</html>

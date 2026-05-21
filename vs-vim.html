@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Guide — Vim vs Neovim</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .diff-section {
+      margin-bottom: 3rem;
+    }
+    .diff-section h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.6rem;
+      margin-bottom: 1.2rem;
+    }
+    .vim-nvim-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .intro-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    .intro-card.vim-card { border-top: 3px solid var(--orange); }
+    .intro-card.nvim-card { border-top: 3px solid var(--accent); }
+    .intro-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .intro-card.vim-card h3 { color: var(--orange); }
+    .intro-card.nvim-card h3 { color: var(--accent); }
+    .intro-card .version {
+      font-size: 0.75rem;
+      color: var(--fg3);
+      margin-bottom: 0.8rem;
+    }
+    .intro-card p {
+      color: var(--fg2);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    .winner-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--bg);
+      border-radius: 3px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.1rem 0.4rem;
+      letter-spacing: 0.05em;
+      vertical-align: middle;
+    }
+    .winner-badge.vim-win { background: var(--orange); }
+    .winner-badge.tie { background: var(--fg3); }
+    @media (max-width: 700px) {
+      .vim-nvim-intro { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="index.html">Basics</a></li>
+    <li><a href="advanced.html">Advanced</a></li>
+    <li><a href="vs-vim.html" class="active">Vim vs Neovim</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+    <li><a href="practice.html">Practice</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <h1>Vim vs Neovim</h1>
+    <p>A deep comparison — architecture, features, extensibility, and which to choose.</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- INTRO CARDS -->
+  <div class="vim-nvim-intro">
+    <div class="intro-card vim-card">
+      <h3>Vim</h3>
+      <div class="version">Current: 9.x &mdash; Created by Bram Moolenaar (1991)</div>
+      <p>The legendary editor that defined modal text editing. Vim 9 brought a new scripting language (Vim9script) for speed improvements. Extremely stable, ships everywhere, and is the benchmark all modal editors measure against.</p>
+    </div>
+    <div class="intro-card nvim-card">
+      <h3>Neovim</h3>
+      <div class="version">Current: 0.10+ &mdash; Fork by Thiago de Arruda (2014)</div>
+      <p>A refactor of Vim focused on extensibility, modern architecture, and better defaults. First-class Lua scripting, built-in LSP, Treesitter, async job control, RPC API, and a vibrant plugin ecosystem define the Neovim experience.</p>
+    </div>
+  </div>
+
+  <!-- BIG TABLE -->
+  <div class="diff-section">
+    <h2>&#9878; Feature Comparison</h2>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th class="feature-col">Feature</th>
+          <th class="vim-col">Vim</th>
+          <th class="nvim-col">Neovim</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-col">Scripting language</td>
+          <td>Vimscript / Vim9script</td>
+          <td>Lua <span class="tag tag-native">native</span> + Vimscript</td>
+          <td class="key-desc">Neovim's Lua is JIT-compiled (LuaJIT), much faster. Vim9script is fast but Vim-only.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">LSP support</td>
+          <td><span class="tag tag-plugin">plugin only</span> (vim-lsp, ALE)</td>
+          <td><span class="tag tag-native">built-in</span></td>
+          <td class="key-desc">Neovim has a native LSP client since 0.5. Vim requires plugins.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Treesitter</td>
+          <td><span class="tag tag-partial">partial plugin</span></td>
+          <td><span class="tag tag-native">built-in</span></td>
+          <td class="key-desc">Neovim bundles Treesitter for accurate parsing. Vim has a plugin but integration is limited.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Async job control</td>
+          <td><span class="tag tag-yes">yes</span> (vim 8+)</td>
+          <td><span class="tag tag-yes">yes</span></td>
+          <td class="key-desc">Both support async, but Neovim's libuv-based event loop is more robust.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">RPC / API</td>
+          <td><span class="tag tag-no">no</span></td>
+          <td><span class="tag tag-native">built-in</span></td>
+          <td class="key-desc">Neovim exposes a msgpack-RPC API, enabling GUI frontends (neovide, goneovim) and external tools.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">GUI frontends</td>
+          <td>gvim (built-in)</td>
+          <td>Neovide, nvim-qt, goneovim, Neovim.app</td>
+          <td class="key-desc">Neovim's RPC API allows richer 3rd-party GUIs with animations, fonts, etc.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Default config location</td>
+          <td><code>~/.vimrc</code></td>
+          <td><code>~/.config/nvim/init.lua</code></td>
+          <td class="key-desc">Neovim follows XDG spec. Lua config is the modern standard.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Vimscript compat</td>
+          <td><span class="tag tag-yes">full</span></td>
+          <td><span class="tag tag-partial">mostly</span></td>
+          <td class="key-desc">Neovim supports most Vimscript. Some rarely-used features differ.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Terminal emulator</td>
+          <td><span class="tag tag-yes">yes</span> (vim 8+)</td>
+          <td><span class="tag tag-yes">yes</span></td>
+          <td class="key-desc">Both have <code>:term</code>. Neovim's terminal mode is more polished.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Floating windows</td>
+          <td><span class="tag tag-no">no</span></td>
+          <td><span class="tag tag-native">built-in</span></td>
+          <td class="key-desc">Neovim has <code>nvim_open_win()</code>. Enables modern UI elements: popups, hover docs, etc.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Virtual text / extmarks</td>
+          <td><span class="tag tag-no">no</span></td>
+          <td><span class="tag tag-native">built-in</span></td>
+          <td class="key-desc">Inline diagnostic hints, git blame, and other overlays require virtual text.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Diagnostic system</td>
+          <td><span class="tag tag-no">no</span> (plugin)</td>
+          <td><span class="tag tag-native">vim.diagnostic</span></td>
+          <td class="key-desc">Unified diagnostic API for LSP, linters, etc. Plugins hook into one system.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Spell check</td>
+          <td><span class="tag tag-yes">yes</span></td>
+          <td><span class="tag tag-yes">yes</span></td>
+          <td class="key-desc">Identical. <kbd>:set spell</kbd> works in both.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Folding</td>
+          <td><span class="tag tag-yes">yes</span></td>
+          <td><span class="tag tag-yes">yes</span></td>
+          <td class="key-desc">Both support all fold methods. Neovim adds Treesitter-based folds.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Plugin ecosystem</td>
+          <td>Large (vim-plug, Vundle)</td>
+          <td>Larger + modern (lazy.nvim)</td>
+          <td class="key-desc">Most new plugins are Neovim-only. Vim plugins largely work in Neovim too.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Built-in completion</td>
+          <td><span class="tag tag-yes">yes</span> (omni)</td>
+          <td><span class="tag tag-yes">yes</span> + LSP</td>
+          <td class="key-desc">Both have <kbd>Ctrl+n</kbd> completion. Neovim adds LSP completion via plugins (nvim-cmp).</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Startup time</td>
+          <td>Very fast</td>
+          <td>Fast (slightly heavier base)</td>
+          <td class="key-desc">Both are fast. Vim edge with default install; Neovim with lazy loading.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">License</td>
+          <td>Vim license (charityware)</td>
+          <td>Apache 2.0</td>
+          <td class="key-desc">Neovim uses a standard OSI-approved license.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Default colorscheme</td>
+          <td>default</td>
+          <td>habamax (Nvim 0.8+)</td>
+          <td class="key-desc">Neovim ships with better defaults including habamax, lunaperche.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">ubiquity / preinstalled</td>
+          <td><span class="winner-badge vim-win">vim wins</span></td>
+          <td>Less common preinstalled</td>
+          <td class="key-desc">Vim or vi is on virtually every Unix/Linux system by default.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- KEY DIFFERENTIATORS -->
+  <div class="diff-section">
+    <h2>&#9889; Key Differentiators In Depth</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title" style="color:var(--accent);">Neovim: Lua-First Design</div>
+        <p class="key-desc">While Vim uses Vimscript (slow, opaque) and the new Vim9script, Neovim made Lua a first-class citizen from day one. Configuration, plugins, and even core features use Lua. This means:</p>
+        <ul style="margin-top:0.6rem;padding-left:1.2rem;color:var(--fg2);font-size:0.85rem;line-height:1.8;">
+          <li>Faster plugin execution (LuaJIT)</li>
+          <li>Familiar language for developers</li>
+          <li>Access to the full Lua standard library</li>
+          <li>Easy integration with C extensions</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent);">Neovim: Built-in LSP Client</div>
+        <p class="key-desc">Language Server Protocol allows editors to get IDE features (autocompletion, go-to-definition, diagnostics) from external language servers. Neovim ships with a native LSP client (<code>vim.lsp</code>) meaning:</p>
+        <ul style="margin-top:0.6rem;padding-left:1.2rem;color:var(--fg2);font-size:0.85rem;line-height:1.8;">
+          <li>No polling — async by default</li>
+          <li>Works with any LSP-compliant server</li>
+          <li>Unified API for all languages</li>
+          <li>No more ALE/YCM fragmentation</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent);">Neovim: Headless + RPC API</div>
+        <p class="key-desc">Neovim can run fully headless and be controlled via msgpack-RPC. This enables:</p>
+        <ul style="margin-top:0.6rem;padding-left:1.2rem;color:var(--fg2);font-size:0.85rem;line-height:1.8;">
+          <li>Rich GUI frontends (Neovide)</li>
+          <li>IDE plugin bridges (VS Code, IntelliJ)</li>
+          <li>Automated testing of editor behavior</li>
+          <li>Embedding Neovim in other apps</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--orange);">Vim: Ubiquity &amp; Stability</div>
+        <p class="key-desc">Vim's main advantages over Neovim:</p>
+        <ul style="margin-top:0.6rem;padding-left:1.2rem;color:var(--fg2);font-size:0.85rem;line-height:1.8;">
+          <li>Available on nearly every Unix system</li>
+          <li>Extremely stable — fewer breaking changes</li>
+          <li>Lower dependency footprint</li>
+          <li>Vim9script for advanced Vimscript users</li>
+          <li>Better if you SSH to many servers</li>
+          <li>gvim for cross-platform GUI</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIGRATION -->
+  <div class="diff-section">
+    <h2>&#128260; Migrating from Vim to Neovim</h2>
+    <div class="callout tip">
+      <strong>Good news:</strong> Your <code>.vimrc</code> is mostly compatible. Neovim sources it from <code>~/.vim/vimrc</code> and most Vim plugins work unchanged.
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">Step 1 — Create init.lua</div>
+        <p class="key-desc">Create <code>~/.config/nvim/init.lua</code>. You can start by just calling your old vimrc:</p>
+        <pre><code>vim.cmd('source ~/.vimrc')</code></pre>
+        <p class="key-desc" style="margin-top:0.5rem;">Then gradually migrate pieces to Lua.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Step 2 — Migrate Options</div>
+        <p class="key-desc">Replace <code>set</code> with <code>vim.opt</code>:</p>
+        <pre><code>-- Vim
+set number
+set tabstop=2
+
+-- Neovim (Lua)
+vim.opt.number = true
+vim.opt.tabstop = 2</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-title">Step 3 — Migrate Keymaps</div>
+        <p class="key-desc">Replace <code>nnoremap</code> with <code>vim.keymap.set</code>:</p>
+        <pre><code>-- Vim
+nnoremap &lt;leader&gt;ff :find &lt;CR&gt;
+
+-- Neovim (Lua)
+vim.keymap.set('n', '&lt;leader&gt;ff',
+  vim.cmd.find)</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-title">Step 4 — Switch Plugin Manager</div>
+        <p class="key-desc">Move from vim-plug to lazy.nvim for lazy-loading, better performance, and Lua-native plugin config. Most vim-plug plugins work directly in lazy.nvim:</p>
+        <pre><code>-- vim-plug
+Plug 'tpope/vim-fugitive'
+
+-- lazy.nvim
+{ 'tpope/vim-fugitive' }</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHEN TO USE WHICH -->
+  <div class="diff-section">
+    <h2>&#9878; When to Use Which</h2>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th class="vim-col">Use Vim if...</th>
+          <th class="nvim-col">Use Neovim if...</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-col">Server editing</td>
+          <td class="key-desc">You SSH to many remote servers where only vi/vim is available</td>
+          <td class="key-desc">You install your own tools on servers</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Stability preference</td>
+          <td class="key-desc">You want a config that never breaks on update</td>
+          <td class="key-desc">You're okay with occasional plugin breakage for more features</td>
+        </tr>
+        <tr>
+          <td class="feature-col">IDE-like features</td>
+          <td class="key-desc">Basic editing, minimal plugins</td>
+          <td class="key-desc">You want LSP, diagnostics, completion, git integration built-in</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Programming workflow</td>
+          <td class="key-desc">Simple scripting and config editing</td>
+          <td class="key-desc">Primary IDE for daily development</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Plugin authoring</td>
+          <td class="key-desc">You know Vimscript well</td>
+          <td class="key-desc">You prefer Lua and want async APIs</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Bottom line:</strong> If you're starting fresh in 2024+, choose <strong>Neovim</strong>. The ecosystem, built-in features, and Lua scripting make it the clear choice for a power editor. Keep learning core Vim motions — they work identically in both.
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Neovim Guide &mdash; <a href="https://neovim.io" target="_blank">neovim.io</a> &mdash; <a href="practice.html">Practice Now</a></p>
+</footer>
+
+</body>
+</html>
