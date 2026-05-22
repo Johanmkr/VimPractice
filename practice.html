@@ -107,6 +107,18 @@
     .exercise-title .check { color: var(--green); }
     .exercise-desc { font-size: 0.75rem; color: var(--fg3); margin-top: 0.15rem; }
 
+    .exercise-category-header {
+      font-size: 0.64rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--fg3);
+      padding: 0.6rem 0.3rem 0.15rem;
+      margin-top: 0.2rem;
+      border-top: 1px solid var(--border);
+    }
+    .exercise-category-header:first-child { border-top: none; margin-top: 0; }
+
     .ref-section { margin-bottom: 0.9rem; }
     .ref-section-title {
       font-size: 0.66rem;
@@ -358,7 +370,7 @@
     <div class="progress-bar-wrap">
       <div class="progress-bar-row">
         <span>Progress</span>
-        <span id="progress-label">0/13</span>
+        <span id="progress-label">0/40</span>
       </div>
       <div class="progress-bar-track">
         <div class="progress-bar-fill" id="progress-fill"></div>
@@ -480,10 +492,18 @@
 
 <script src="practice.js"></script>
 <script>
-  // Build exercise list dynamically
+  // Build exercise list dynamically, grouped by category
   (function buildList() {
     const list = document.getElementById('exercise-list');
+    let lastCategory = null;
     EXERCISES.forEach((ex, i) => {
+      if (ex.category !== lastCategory) {
+        const header = document.createElement('div');
+        header.className = 'exercise-category-header';
+        header.textContent = ex.category;
+        list.appendChild(header);
+        lastCategory = ex.category;
+      }
       const div = document.createElement('div');
       div.className = 'exercise-item' + (i === 0 ? ' active' : '');
       div.dataset.ex = i;

@@ -5,7 +5,9 @@
 
 // --- EXERCISES ---
 const EXERCISES = [
+  // ── NAVIGATION ──────────────────────────────────────────────────────────
   {
+    category: "Navigation",
     title: "Basic hjkl Navigation",
     filename: "navigation.txt",
     goal: "Move to the word <span class='goal'>TARGET</span> using only h, j, k, l keys.",
@@ -26,6 +28,7 @@ const EXERCISES = [
     }
   },
   {
+    category: "Navigation",
     title: "Word Jumps: w, b, e",
     filename: "words.txt",
     goal: "Jump to the word <span class='goal'>DESTINATION</span> using <kbd>w</kbd> or <kbd>b</kbd>.",
@@ -42,6 +45,7 @@ const EXERCISES = [
     }
   },
   {
+    category: "Navigation",
     title: "Line Motions: 0, ^, $",
     filename: "lines.txt",
     goal: "Reach the <span class='goal'>END</span> marker using <kbd>$</kbd>, then return to start with <kbd>0</kbd>.",
@@ -54,7 +58,92 @@ const EXERCISES = [
     check: (s) => s.usedDollar && s.usedZero
   },
   {
-    title: "Insert Mode",
+    category: "Navigation",
+    title: "File Navigation: gg, G",
+    filename: "bigfile.txt",
+    goal: "Jump to the bottom with <span class='goal'>G</span>, then back to the top with <span class='goal'>gg</span>.",
+    hint: "Press <kbd>G</kbd> (Shift+g) for last line, <kbd>gg</kbd> for first line.",
+    content: [
+      "=== TOP OF FILE — you start here ===",
+      "Line 2", "Line 3", "Line 4", "Line 5",
+      "Line 6", "Line 7", "Line 8", "Line 9",
+      "Line 10", "Line 11", "Line 12", "Line 13",
+      "Line 14", "Line 15", "Line 16", "Line 17",
+      "=== BOTTOM OF FILE — use G to reach here, then gg to return ==="
+    ],
+    check: (s) => s.visitedTop && s.visitedBottom
+  },
+  {
+    category: "Navigation",
+    title: "f and t Jumps",
+    filename: "jumps.txt",
+    goal: "Use <span class='goal'>f</span> at least twice to jump to characters on a line.",
+    hint: "Press <kbd>f</kbd> then a character to jump TO it. Press <kbd>;</kbd> to repeat.",
+    content: [
+      "find the @ symbol with f@ — try it on this line!",
+      "use tx to jump just before the X: hello X world",
+      "Press ; to repeat the last f or t jump forward",
+      "Press , to repeat it backward"
+    ],
+    check: (s) => s.fJumpCount >= 2
+  },
+  {
+    category: "Navigation",
+    title: "Half-Page Scrolling",
+    filename: "scroll.txt",
+    goal: "Scroll down with <span class='goal'>Ctrl+d</span> then back up with <span class='goal'>Ctrl+u</span>.",
+    hint: "Hold Ctrl and press <kbd>d</kbd> to scroll down half a page, <kbd>u</kbd> to scroll up.",
+    content: [
+      "Line 1 — scroll down from here",
+      "Line 2", "Line 3", "Line 4", "Line 5",
+      "Line 6", "Line 7", "Line 8", "Line 9",
+      "Line 10", "Line 11", "Line 12", "Line 13",
+      "Line 14", "Line 15", "Line 16", "Line 17",
+      "Line 18", "Line 19", "Line 20",
+      "Line 21 — then scroll back up with Ctrl+u!"
+    ],
+    check: (s) => s.usedCtrlD && s.usedCtrlU
+  },
+  {
+    category: "Navigation",
+    title: "Bracket Matching: %",
+    filename: "brackets.txt",
+    goal: "Use <span class='goal'>%</span> to jump between matching brackets.",
+    hint: "Place cursor on any bracket and press <kbd>%</kbd> to jump to its match.",
+    content: [
+      "function example(x, y) {",
+      "  if (x > 0) {",
+      "    return [x, y];",
+      "  }",
+      "}",
+      "",
+      "Jump from ( to ) then { to } and [ to ] using %"
+    ],
+    check: (s) => s.usedPercent
+  },
+  {
+    category: "Navigation",
+    title: "Screen Positions: H, M, L",
+    filename: "screen.txt",
+    goal: "Jump to top with <span class='goal'>H</span>, middle with <span class='goal'>M</span>, and bottom with <span class='goal'>L</span>.",
+    hint: "<kbd>H</kbd> = top of screen, <kbd>M</kbd> = middle, <kbd>L</kbd> = bottom. No scrolling needed!",
+    content: [
+      "=== Use H to jump here (top of screen) ===",
+      "Line 2", "Line 3", "Line 4", "Line 5",
+      "Line 6", "Line 7", "Line 8", "Line 9",
+      "Line 10", "Line 11", "Line 12",
+      "=== Use M to reach the middle ===",
+      "Line 14", "Line 15", "Line 16",
+      "Line 17", "Line 18", "Line 19",
+      "=== Use L to jump here (bottom of screen) ==="
+    ],
+    check: (s) => s.usedH && s.usedM && s.usedL
+  },
+
+  // ── INSERT & EDIT ─────────────────────────────────────────────────────────
+  {
+    category: "Insert & Edit",
+    title: "Insert Mode: i, o",
     filename: "insert.txt",
     goal: "Add the text <span class='goal'>INSERTED</span> anywhere in the file using Insert mode.",
     hint: "Press <kbd>i</kbd> to enter Insert mode, type INSERTED, then press <kbd>Esc</kbd> to return to Normal.",
@@ -67,7 +156,87 @@ const EXERCISES = [
     check: (s) => s.lines.some(l => l.includes("INSERTED"))
   },
   {
-    title: "Delete & Change",
+    category: "Insert & Edit",
+    title: "Append: a, A, I",
+    filename: "append.txt",
+    goal: "Use <span class='goal'>A</span> to append text to the end of an incomplete line.",
+    hint: "<kbd>A</kbd> jumps to end of line and enters Insert mode. <kbd>I</kbd> goes to the start.",
+    content: [
+      "This line is incomplete —",
+      "so is this one —",
+      "and this one —",
+      "",
+      "Use A to append ' COMPLETE' to any of the lines above."
+    ],
+    check: (s) => s.usedCapitalA && s.lines.some(l => l.includes("COMPLETE"))
+  },
+  {
+    category: "Insert & Edit",
+    title: "Open New Lines: o, O",
+    filename: "newlines.txt",
+    goal: "Use <span class='goal'>o</span> to open a line below and type something, then <span class='goal'>O</span> above.",
+    hint: "<kbd>o</kbd> opens a line below and enters Insert mode. <kbd>O</kbd> opens a line above.",
+    content: [
+      "First line",
+      "Second line",
+      "Third line",
+      "",
+      "Use o on line 2 to insert text between 2nd and 3rd.",
+      "Use O on line 3 to insert text before it."
+    ],
+    check: (s) => s.lines.length >= 8
+  },
+  {
+    category: "Insert & Edit",
+    title: "Replace Char: r",
+    filename: "replace_char.txt",
+    goal: "Fix the typos by pressing <span class='goal'>r</span> then the correct character.",
+    hint: "<kbd>r</kbd> replaces the char under cursor without entering Insert mode.",
+    content: [
+      "Thix sentence has a typo.",
+      "Sn does thes one.",
+      "And thiq one too.",
+      "",
+      "Use r to fix: x→s, n→o, s→i, q→s"
+    ],
+    check: (s) => !s.lines.some(l => /Thix|thes|thiq/.test(l)) &&
+                  !s.lines[1].startsWith("Sn ")
+  },
+  {
+    category: "Insert & Edit",
+    title: "Join Lines: J",
+    filename: "join.txt",
+    goal: "Join the first three lines into one sentence using <span class='goal'>J</span>.",
+    hint: "Press <kbd>J</kbd> to join the current line with the line below. Use <kbd>3J</kbd> to join 3 at once.",
+    content: [
+      "This sentence is",
+      "split across",
+      "multiple lines.",
+      "",
+      "Use J (or 3J) to merge the first three lines."
+    ],
+    check: (s) => s.lines.some(l => l.includes("This sentence is") && l.includes("split across"))
+  },
+  {
+    category: "Insert & Edit",
+    title: "Replace Mode: R",
+    filename: "replace_mode.txt",
+    goal: "Overwrite the dashes with text using <span class='goal'>R</span> (Replace mode).",
+    hint: "<kbd>R</kbd> enters Replace mode — typing overwrites characters instead of inserting.",
+    content: [
+      "Name:    --------",
+      "City:    --------",
+      "Country: --------",
+      "",
+      "Navigate to the dashes and use R to overwrite them."
+    ],
+    check: (s) => !s.lines.some(l => l.includes("--------"))
+  },
+
+  // ── DELETE & CHANGE ───────────────────────────────────────────────────────
+  {
+    category: "Delete & Change",
+    title: "Delete Lines: dd",
     filename: "delete.txt",
     goal: "Delete <span class='goal'>all</span> lines that say DELETE THIS LINE using <kbd>dd</kbd>.",
     hint: "Move to the target line with j/k, then press <kbd>dd</kbd> to delete it. Repeat for each.",
@@ -82,7 +251,74 @@ const EXERCISES = [
     check: (s) => !s.lines.some(l => l.includes("DELETE THIS LINE"))
   },
   {
-    title: "Yank & Paste",
+    category: "Delete & Change",
+    title: "Delete with Motion: dw, d$",
+    filename: "dmotion.txt",
+    goal: "Use <span class='goal'>dw</span> to delete a word and <span class='goal'>d$</span> to delete to end of line.",
+    hint: "<kbd>dw</kbd> deletes from cursor to next word. <kbd>d$</kbd> deletes to end of line.",
+    content: [
+      "Remove the EXTRA word from this sentence.",
+      "Delete everything after this: REMOVE THIS PART",
+      "This line is fine, leave it alone.",
+      "",
+      "Use dw on 'EXTRA' and d$ starting at 'REMOVE'."
+    ],
+    check: (s) => !s.lines.some(l => l.includes("EXTRA")) &&
+                  !s.lines.some(l => l.includes("REMOVE THIS PART"))
+  },
+  {
+    category: "Delete & Change",
+    title: "Change Word: cw, ciw",
+    filename: "change.txt",
+    goal: "Change every <span class='goal'>WRONG</span> to something else using <kbd>cw</kbd> or <kbd>ciw</kbd>.",
+    hint: "<kbd>cw</kbd> changes from cursor to end of word. <kbd>ciw</kbd> changes the whole word regardless of cursor position.",
+    content: [
+      "The WRONG answer is not acceptable.",
+      "Please enter the WRONG value here.",
+      "This is totally WRONG.",
+      "",
+      "Use cw or ciw to replace each WRONG."
+    ],
+    check: (s) => !s.lines.some(l => l.includes("WRONG"))
+  },
+  {
+    category: "Delete & Change",
+    title: "Delete Char: x",
+    filename: "xdelete.txt",
+    goal: "Fix the doubled letters using <span class='goal'>x</span> to delete the extra character.",
+    hint: "<kbd>x</kbd> deletes the character under cursor. Navigate to the extra letter and press x.",
+    content: [
+      "Remoove the extra letters.",
+      "Neovimm is great.",
+      "Practicce makes perfect.",
+      "",
+      "Use x to remove one letter from each doubled pair."
+    ],
+    check: (s) => s.lines.some(l => l === "Remove the extra letters.") &&
+                  s.lines.some(l => l === "Neovim is great.") &&
+                  s.lines.some(l => l === "Practice makes perfect.")
+  },
+  {
+    category: "Delete & Change",
+    title: "Change to EOL: C and D",
+    filename: "ceol.txt",
+    goal: "Use <span class='goal'>D</span> to delete to end of line, <span class='goal'>C</span> to change to end.",
+    hint: "<kbd>D</kbd> deletes from cursor to EOL. <kbd>C</kbd> does the same then enters Insert mode.",
+    content: [
+      "Keep this part: DELETE THE REST OF THIS LINE",
+      "Keep this part: CHANGE THIS TO SOMETHING NEW",
+      "This line is fine.",
+      "",
+      "Put cursor on 'DELETE' or 'CHANGE' and use D or C."
+    ],
+    check: (s) => !s.lines[0].includes("DELETE THE REST") &&
+                  !s.lines[1].includes("CHANGE THIS TO SOMETHING NEW")
+  },
+
+  // ── YANK & PASTE ──────────────────────────────────────────────────────────
+  {
+    category: "Yank & Paste",
+    title: "Yank & Paste: yy, p",
     filename: "paste.txt",
     goal: "Copy line 1 with <span class='goal'>yy</span>, then paste a duplicate anywhere below it.",
     hint: "On line 1 press <kbd>yy</kbd> to yank it, then navigate and press <kbd>p</kbd> to paste.",
@@ -96,7 +332,190 @@ const EXERCISES = [
     check: (s) => s.lines.filter(l => l.includes("COPY ME")).length >= 2
   },
   {
-    title: "Search with /",
+    category: "Yank & Paste",
+    title: "Paste Before: P",
+    filename: "paste_before.txt",
+    goal: "Yank the last line and paste it <span class='goal'>before</span> the target using <kbd>P</kbd>.",
+    hint: "<kbd>p</kbd> pastes after the cursor line. <kbd>P</kbd> pastes before it.",
+    content: [
+      "--- PASTE TARGET: paste above this line ---",
+      "Line A",
+      "Line B",
+      "Line C",
+      "YANK THIS LINE"
+    ],
+    check: (s) => {
+      const targetIdx = s.lines.findIndex(l => l.includes("--- PASTE TARGET"));
+      return targetIdx > 0 && s.lines[targetIdx - 1].includes("YANK THIS LINE");
+    }
+  },
+  {
+    category: "Yank & Paste",
+    title: "Yank Word: yw",
+    filename: "yank_word.txt",
+    goal: "Yank the word <span class='goal'>KEYWORD</span> with <kbd>yw</kbd> and paste it where marked.",
+    hint: "<kbd>yw</kbd> yanks from cursor to end of the next word. Navigate and <kbd>p</kbd> to paste.",
+    content: [
+      "The word KEYWORD should be duplicated.",
+      "Paste it here: [BLANK]",
+      "And also here: [BLANK]",
+      "",
+      "Use yw on KEYWORD, then navigate to [BLANK] and paste."
+    ],
+    check: (s) => s.lines.filter(l => l.includes("KEYWORD")).length >= 2
+  },
+
+  // ── VISUAL MODE ───────────────────────────────────────────────────────────
+  {
+    category: "Visual Mode",
+    title: "Visual Line: V + d",
+    filename: "visual.txt",
+    goal: "Select and delete the line <span class='goal'>=== DELETE ME ===</span> using <kbd>V</kbd> then <kbd>d</kbd>.",
+    hint: "Move to the target line, press <kbd>V</kbd> to select it, then <kbd>d</kbd> to delete.",
+    content: [
+      "Keep this line.",
+      "Keep this too.",
+      "=== DELETE ME ===",
+      "This line stays.",
+      "This line stays too."
+    ],
+    check: (s) => !s.lines.some(l => l.includes("DELETE ME"))
+  },
+  {
+    category: "Visual Mode",
+    title: "Visual Char: v + y",
+    filename: "vchar.txt",
+    goal: "Use <span class='goal'>v</span> to select just the word <span class='goal'>GRAB</span>, yank it, then paste.",
+    hint: "Press <kbd>v</kbd> to start char-visual, use motion to select GRAB, press <kbd>y</kbd> to yank, then <kbd>p</kbd> to paste.",
+    content: [
+      "This line has the word GRAB in it.",
+      "Paste it here: [empty slot]",
+      "",
+      "Select only 'GRAB' with v+motion+y, then paste with p."
+    ],
+    check: (s) => s.lines.some(l => l !== "This line has the word GRAB in it." && l.includes("GRAB"))
+  },
+  {
+    category: "Visual Mode",
+    title: "Visual Indent: V + >",
+    filename: "vindent.txt",
+    goal: "Select the inner lines and indent them with <kbd>V</kbd> then <kbd>></kbd>.",
+    hint: "Press <kbd>V</kbd> then <kbd>j</kbd> to select multiple lines, then <kbd>></kbd> to indent them.",
+    content: [
+      "function hello() {",
+      "console.log('hello');",
+      "console.log('world');",
+      "return true;",
+      "}",
+      "",
+      "Select lines 2-4 with V and indent them with >."
+    ],
+    check: (s) => s.lines[1] && s.lines[1].startsWith("  ") &&
+                  s.lines[2] && s.lines[2].startsWith("  ")
+  },
+  {
+    category: "Visual Mode",
+    title: "Visual Uppercase: V + U",
+    filename: "vcase.txt",
+    goal: "Select the first two lines and uppercase them with <span class='goal'>U</span>.",
+    hint: "Press <kbd>V</kbd> to select lines, then <kbd>U</kbd> to uppercase, <kbd>u</kbd> to lowercase.",
+    content: [
+      "this text needs to be uppercased",
+      "make this one all caps too",
+      "LEAVE THIS LINE ALONE",
+      "",
+      "Select lines 1-2 with V+j and press U."
+    ],
+    check: (s) => s.lines[0] === s.lines[0].toUpperCase() &&
+                  s.lines[1] === s.lines[1].toUpperCase()
+  },
+
+  // ── TEXT OBJECTS ──────────────────────────────────────────────────────────
+  {
+    category: "Text Objects",
+    title: "Text Objects: ci\"",
+    filename: "textobj.txt",
+    goal: "Change the word inside quotes using <span class='goal'>ci\"</span>.",
+    hint: "Place cursor inside or near the quoted text, then type <kbd>ci\"</kbd> to change it.",
+    content: [
+      "const greeting = \"Hello World\";",
+      "const name = \"change me\";",
+      "console.log(\"old value\");",
+      "",
+      "Try ciw to change word under cursor,",
+      "or ci( to change inside parentheses: func(argument)"
+    ],
+    check: (s) => s.usedTextObject
+  },
+  {
+    category: "Text Objects",
+    title: "Change Inner Word: ciw",
+    filename: "ciw.txt",
+    goal: "Use <span class='goal'>ciw</span> to replace every <span class='goal'>OLDWORD</span> without moving to its start.",
+    hint: "<kbd>ciw</kbd> works from anywhere inside a word — no need to navigate to the first letter.",
+    content: [
+      "The OLDWORD should be replaced.",
+      "Change OLDWORD without moving to its start.",
+      "ciw works from anywhere inside the OLDWORD!",
+      "",
+      "Put cursor anywhere on OLDWORD, then type ciw."
+    ],
+    check: (s) => !s.lines.some(l => l.includes("OLDWORD"))
+  },
+  {
+    category: "Text Objects",
+    title: "Delete Around Word: daw",
+    filename: "daw.txt",
+    goal: "Use <span class='goal'>daw</span> to delete <span class='goal'>REMOVE</span> including surrounding space.",
+    hint: "<kbd>daw</kbd> deletes the word AND surrounding whitespace — cleaner than <kbd>dw</kbd>.",
+    content: [
+      "Please REMOVE this word from the sentence.",
+      "Also delete REMOVE from here too.",
+      "daw vs dw: daw cleans up the extra space!",
+      "",
+      "Use daw on each 'REMOVE' word."
+    ],
+    check: (s) => !s.lines.some(l => l.includes("REMOVE"))
+  },
+  {
+    category: "Text Objects",
+    title: "Change Inside Parens: ci(",
+    filename: "ci_paren.txt",
+    goal: "Change the arguments inside each function call using <span class='goal'>ci(</span>.",
+    hint: "Put cursor anywhere between the parens, type <kbd>ci(</kbd> to delete contents and enter Insert mode.",
+    content: [
+      "print(old_argument)",
+      "greet(wrong_name)",
+      "calculate(bad_value)",
+      "",
+      "Use ci( to replace each argument with something new."
+    ],
+    check: (s) => !s.lines.some(l =>
+      /print\(old_argument\)|greet\(wrong_name\)|calculate\(bad_value\)/.test(l))
+  },
+  {
+    category: "Text Objects",
+    title: "Delete Paragraph: dap",
+    filename: "dap.txt",
+    goal: "Delete the second paragraph using <span class='goal'>dap</span>.",
+    hint: "Place cursor anywhere inside a paragraph and type <kbd>dap</kbd> to delete the whole paragraph.",
+    content: [
+      "This is the first paragraph.",
+      "It has two lines of text.",
+      "",
+      "DELETE THIS PARAGRAPH",
+      "It should be removed entirely.",
+      "",
+      "This is the third paragraph.",
+      "Keep this one intact."
+    ],
+    check: (s) => !s.lines.some(l => l.includes("DELETE THIS PARAGRAPH"))
+  },
+
+  // ── SEARCH & REPLACE ──────────────────────────────────────────────────────
+  {
+    category: "Search & Replace",
+    title: "Search Forward: /",
     filename: "search.txt",
     goal: "Search for <span class='goal'>needle</span> and navigate through at least 3 matches using <kbd>n</kbd>.",
     hint: "Type <kbd>/needle</kbd> then Enter to search. Press <kbd>n</kbd> to jump to the next match.",
@@ -112,36 +531,56 @@ const EXERCISES = [
     check: (s) => s.nPresses >= 3
   },
   {
-    title: "Visual Mode",
-    filename: "visual.txt",
-    goal: "Select and delete the line <span class='goal'>=== DELETE ME ===</span> using <kbd>V</kbd> then <kbd>d</kbd>.",
-    hint: "Move to the target line, press <kbd>V</kbd> to select it, then <kbd>d</kbd> to delete.",
+    category: "Search & Replace",
+    title: "Word Search: *",
+    filename: "star.txt",
+    goal: "Use <span class='goal'>*</span> to search for the word under the cursor.",
+    hint: "Place cursor on any word and press <kbd>*</kbd> to find all occurrences. Press <kbd>n</kbd> to cycle.",
     content: [
-      "Keep this line.",
-      "Keep this too.",
-      "=== DELETE ME ===",
-      "This line stays.",
-      "This line stays too."
+      "The word target appears multiple times.",
+      "Press * on target to find the next target.",
+      "Another target is hiding here.",
+      "And one final target at the end.",
+      "",
+      "Use * on 'target', then n to cycle through all matches."
     ],
-    check: (s) => !s.lines.some(l => l.includes("DELETE ME"))
+    check: (s) => s.usedStar
   },
   {
-    title: "File Navigation",
-    filename: "bigfile.txt",
-    goal: "Jump to the bottom with <span class='goal'>G</span>, then back to the top with <span class='goal'>gg</span>.",
-    hint: "Press <kbd>G</kbd> (Shift+g) for last line, <kbd>gg</kbd> for first line.",
+    category: "Search & Replace",
+    title: "Line Substitution: :s",
+    filename: "subst.txt",
+    goal: "Replace 'fox' with 'cat' on the current line using <span class='goal'>:s/fox/cat/</span>.",
+    hint: "Type <kbd>:s/fox/cat/</kbd> — this replaces the first match on the current line.",
     content: [
-      "=== TOP OF FILE — you start here ===",
-      "Line 2", "Line 3", "Line 4", "Line 5",
-      "Line 6", "Line 7", "Line 8", "Line 9",
-      "Line 10", "Line 11", "Line 12", "Line 13",
-      "Line 14", "Line 15", "Line 16", "Line 17",
-      "=== BOTTOM OF FILE — use G to reach here, then gg to return ==="
+      "The quick brown fox jumps over the lazy dog.",
+      "Another fox is on this line too.",
+      "A third fox appears here.",
+      "",
+      "Use :s/fox/cat/ on the current line, then repeat on others."
     ],
-    check: (s) => s.visitedTop && s.visitedBottom
+    check: (s) => s.usedSubstitute
   },
   {
-    title: "Undo & Repeat",
+    category: "Search & Replace",
+    title: "Global Substitute: :%s",
+    filename: "gsubst.txt",
+    goal: "Replace <span class='goal'>all</span> occurrences of 'bad' with 'good' using <span class='goal'>:%s/bad/good/g</span>.",
+    hint: "<kbd>:%s/bad/good/g</kbd> — % means all lines, g means all matches per line.",
+    content: [
+      "This is bad code with bad logic.",
+      "The bad variable has a bad value.",
+      "bad naming makes bad programs.",
+      "",
+      "Use :%s/bad/good/g to fix every occurrence at once."
+    ],
+    check: (s) => !s.lines.some(l => l.includes("bad"))
+  },
+
+  // ── UNDO & REPEAT ─────────────────────────────────────────────────────────
+  {
+    category: "Undo & Repeat",
+    title: "Undo & Redo: u, Ctrl+r",
     filename: "undo.txt",
     goal: "Delete a line with <span class='goal'>dd</span>, undo with <span class='goal'>u</span>, redo with <span class='goal'>Ctrl+r</span>.",
     hint: "Press <kbd>dd</kbd> to delete, <kbd>u</kbd> to undo, <kbd>Ctrl+r</kbd> to redo.",
@@ -154,39 +593,62 @@ const EXERCISES = [
     ],
     check: (s) => s.undoCount >= 1 && s.redoCount >= 1
   },
+
+  // ── ADVANCED ──────────────────────────────────────────────────────────────
   {
-    title: "f and t Jumps",
-    filename: "jumps.txt",
-    goal: "Use <span class='goal'>f</span> twice to jump to characters on a line.",
-    hint: "Press <kbd>f</kbd> then a character to jump TO it. Press <kbd>;</kbd> to repeat the jump.",
+    category: "Advanced",
+    title: "Indentation: >>, <<",
+    filename: "indent.txt",
+    goal: "Indent the inner lines using <span class='goal'>>></span> and remove indent with <span class='goal'><<</span>.",
+    hint: "<kbd>>></kbd> indents the current line. <kbd><<</kbd> unindents. Use a count: <kbd>3>></kbd>.",
     content: [
-      "find the @ symbol with f@ — try it on this line!",
-      "use tx to jump just before the X: hello X world",
-      "Press ; to repeat the last f or t jump forward",
-      "Press , to repeat it backward"
-    ],
-    check: (s) => s.fJumpCount >= 2
-  },
-  {
-    title: "Text Objects",
-    filename: "textobj.txt",
-    goal: "Change the word inside quotes using <span class='goal'>ci\"</span>.",
-    hint: "Place cursor inside or near the quoted text, then type <kbd>ci\"</kbd> to change it.",
-    content: [
-      "const greeting = \"Hello World\";",
-      "const name = \"change me\";",
-      "console.log(\"old value\");",
+      "function greet(name) {",
+      "console.log('Hello', name);",
+      "return name;",
+      "}",
       "",
-      "Try ciw to change word under cursor,",
-      "or ci( to change inside parentheses: func(argument)"
+      "Indent lines 2-3 with >> so they sit inside the function."
     ],
-    check: (s) => s.usedTextObject
+    check: (s) => s.lines[1] && s.lines[1].startsWith("  ") &&
+                  s.lines[2] && s.lines[2].startsWith("  ")
   },
   {
+    category: "Advanced",
+    title: "Case Toggle: ~, gU, gu",
+    filename: "case.txt",
+    goal: "Uppercase a line with <span class='goal'>gU</span>, lowercase with <span class='goal'>gu</span>, or toggle with <span class='goal'>~</span>.",
+    hint: "<kbd>~</kbd> toggles one char. <kbd>gU</kbd> uppercases the current line. <kbd>gu</kbd> lowercases.",
+    content: [
+      "this line should become UPPERCASE",
+      "THIS LINE SHOULD BECOME lowercase",
+      "Toggle Individual Chars With Tilde",
+      "",
+      "Use gU on line 1, gu on line 2, ~ on line 3."
+    ],
+    check: (s) => s.usedCaseToggle
+  },
+  {
+    category: "Advanced",
+    title: "Count Prefixes",
+    filename: "counts.txt",
+    goal: "Use <span class='goal'>count prefixes</span> to multiply commands: <kbd>5j</kbd>, <kbd>3w</kbd>, <kbd>2dd</kbd>.",
+    hint: "Type a number before any motion or command to repeat it. <kbd>5j</kbd> moves down 5 lines at once.",
+    content: [
+      "Start here — press 5j to jump to line 6.",
+      "Line 2", "Line 3", "Line 4", "Line 5",
+      "=== You should land here with 5j ===",
+      "Line 7", "Line 8",
+      "Use 2dd to delete these two lines at once.",
+      "Last line."
+    ],
+    check: (s) => s.usedCountPrefix
+  },
+  {
+    category: "Advanced",
     title: "Macros",
     filename: "macros.txt",
     goal: "Record a macro with <span class='goal'>qa</span>, make a change, stop with <span class='goal'>q</span>, replay with <span class='goal'>@a</span>.",
-    hint: "Press <kbd>qa</kbd> to start recording into register a, make changes, <kbd>q</kbd> to stop, <kbd>@a</kbd> to replay.",
+    hint: "Press <kbd>qa</kbd> to start recording, make changes, <kbd>q</kbd> to stop, <kbd>@a</kbd> to replay.",
     content: [
       "item: apple",
       "item: banana",
@@ -198,7 +660,10 @@ const EXERCISES = [
     ],
     check: (s) => s.macroPlayed
   },
+
+  // ── FREE PRACTICE ─────────────────────────────────────────────────────────
   {
+    category: "Free Practice",
     title: "Free Practice",
     filename: "scratch.lua",
     goal: "Free practice — try any commands you like! No goal to reach.",
@@ -232,14 +697,10 @@ function freshState(ex) {
 
     // Mode state machine
     mode: 'normal',
-    // Sub-states within normal mode:
-    //   'normal', 'g', 'op_pending', 'f_pending', 'r_pending',
-    //   'macro_record_name', 'macro_play_name'
     submode: 'normal',
 
     // Pending operator: 'd','y','c','>','<','='
     pendingOp: null,
-    // Count prefix digits
     countStr: '',
 
     // f/t last jump
@@ -254,7 +715,7 @@ function freshState(ex) {
 
     // Registers for macros (a-z)
     macroRegisters: {},
-    recording: null,         // register name being recorded
+    recording: null,
     recordingKeys: [],
     macroPlayed: false,
 
@@ -265,7 +726,7 @@ function freshState(ex) {
     // Command/search input
     cmdBuffer: '',
 
-    // Exercise tracking
+    // Exercise tracking — existing
     visitedTop: false,
     visitedBottom: false,
     usedDollar: false,
@@ -275,6 +736,19 @@ function freshState(ex) {
     undoCount: 0,
     redoCount: 0,
     usedTextObject: false,
+
+    // Exercise tracking — new
+    usedCtrlD: false,
+    usedCtrlU: false,
+    usedPercent: false,
+    usedH: false,
+    usedM: false,
+    usedL: false,
+    usedCapitalA: false,
+    usedStar: false,
+    usedSubstitute: false,
+    usedCaseToggle: false,
+    usedCountPrefix: false,
 
     // For status/feedback
     message: '',
@@ -477,9 +951,9 @@ function handleNormal(key) {
     else if (key === 'j') moveRow(count);
     else if (key === 'k') moveRow(-count);
     else if (key === '_') { moveToLastNonBlank(); }
-    else if (key === '~') { toggleCaseMotion(); }
-    else if (key === 'u') { lowercaseMotion(); }
-    else if (key === 'U') { uppercaseMotion(); }
+    else if (key === '~') { toggleCaseMotion(); state.usedCaseToggle = true; }
+    else if (key === 'u') { lowercaseMotion(); state.usedCaseToggle = true; }
+    else if (key === 'U') { uppercaseMotion(); state.usedCaseToggle = true; }
     return;
   }
 
@@ -534,7 +1008,6 @@ function handleNormal(key) {
     state.submode = 'normal';
     const count = consumeCount();
     if (key === '@') {
-      // replay last
       if (state.lastMacro) playMacro(state.lastMacro, count);
     } else if (/^[a-z]$/.test(key)) {
       playMacro(key, count);
@@ -583,14 +1056,14 @@ function handleNormal(key) {
     }
     case 'g': state.submode = 'g'; state.countStr = String(count > 1 ? count : ''); break;
     case 'G': gotoLine(count > 1 ? count - 1 : state.lines.length - 1); state.visitedBottom = true; break;
-    case 'H': gotoLine(0); break;
-    case 'M': gotoLine(Math.floor(state.lines.length / 2)); break;
-    case 'L': gotoLine(state.lines.length - 1); break;
-    case 'C-d': moveRow(Math.max(1, Math.floor(visibleRows() / 2))); break;
-    case 'C-u': moveRow(-Math.max(1, Math.floor(visibleRows() / 2))); break;
+    case 'H': gotoLine(0); state.usedH = true; break;
+    case 'M': gotoLine(Math.floor(state.lines.length / 2)); state.usedM = true; break;
+    case 'L': gotoLine(state.lines.length - 1); state.usedL = true; break;
+    case 'C-d': moveRow(Math.max(1, Math.floor(visibleRows() / 2))); state.usedCtrlD = true; break;
+    case 'C-u': moveRow(-Math.max(1, Math.floor(visibleRows() / 2))); state.usedCtrlU = true; break;
     case 'C-f': moveRow(visibleRows()); break;
     case 'C-b': moveRow(-visibleRows()); break;
-    case '%': jumpMatchingBracket(); break;
+    case '%': jumpMatchingBracket(); state.usedPercent = true; break;
     case 'f': state.submode = 'f_pending'; state.pendingFCmd = 'f'; state.countStr = String(count > 1 ? count : ''); break;
     case 'F': state.submode = 'f_pending'; state.pendingFCmd = 'F'; state.countStr = String(count > 1 ? count : ''); break;
     case 't': state.submode = 'f_pending'; state.pendingFCmd = 't'; state.countStr = String(count > 1 ? count : ''); break;
@@ -610,6 +1083,7 @@ function handleNormal(key) {
     case 'A': {
       state.cursor.col = (state.lines[state.cursor.row] || '').length;
       enterInsert(0);
+      state.usedCapitalA = true;
       break;
     }
     case 'o': {
@@ -638,7 +1112,6 @@ function handleNormal(key) {
       break;
     }
     case 'S': {
-      // Delete line content, enter insert
       saveUndo();
       const ind = getAutoIndent(state.cursor.row);
       state.lines[state.cursor.row] = ind;
@@ -647,7 +1120,6 @@ function handleNormal(key) {
       break;
     }
     case 'C': {
-      // Change to end of line
       saveUndo();
       const ln = state.lines[state.cursor.row];
       state.clipboard = { type: 'char', text: ln.slice(state.cursor.col) };
@@ -656,7 +1128,6 @@ function handleNormal(key) {
       break;
     }
     case 'D': {
-      // Delete to end of line
       saveUndo();
       const ln = state.lines[state.cursor.row];
       state.clipboard = { type: 'char', text: ln.slice(state.cursor.col) };
@@ -709,6 +1180,7 @@ function handleNormal(key) {
           (c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()) +
           ln.slice(state.cursor.col + 1);
         moveCol(1);
+        state.usedCaseToggle = true;
       }
       break;
     }
@@ -745,7 +1217,7 @@ function handleNormal(key) {
     case '?': state.mode = 'search'; state.searchDir = -1; state.cmdBuffer = ''; break;
     case 'n': for(let i=0;i<count;i++) { nextMatch(state.searchDir); state.nPresses++; } break;
     case 'N': for(let i=0;i<count;i++) nextMatch(-state.searchDir); break;
-    case '*': searchWord(1); break;
+    case '*': searchWord(1); state.usedStar = true; break;
     case '#': searchWord(-1); break;
 
     // Command
@@ -770,8 +1242,6 @@ function handleNormal(key) {
 
     // Scroll cursor centering
     case 'z': {
-      // z<CR> or zz = center — we just handle zz
-      // simplified: any z key = center
       const editorEl = document.getElementById('editor-lines');
       const curEl = editorEl.querySelectorAll('.editor-line')[state.cursor.row];
       if (curEl) curEl.scrollIntoView({ block: 'center' });
@@ -925,12 +1395,10 @@ function applyTextObject(op, mod, obj) {
   if (obj === 'w' || obj === 'W') {
     const big = obj === 'W';
     const isWord = big ? c => !/\s/.test(c) : c => /\w/.test(c);
-    // Find word boundaries
     let start = col, end = col;
     while (start > 0 && isWord(line[start - 1])) start--;
     while (end < line.length - 1 && isWord(line[end + 1])) end++;
     if (mod === 'a') {
-      // include trailing/leading space
       if (end + 1 < line.length && /\s/.test(line[end + 1])) end++;
       else if (start > 0 && /\s/.test(line[start - 1])) start--;
     }
@@ -965,7 +1433,6 @@ function applyTextObject(op, mod, obj) {
     let openCol = -1, closeCol = -1;
 
     if (isPair) {
-      // Search outward for open
       let depth = 0;
       for (let c = col; c >= 0; c--) {
         if (line[c] === close) depth++;
@@ -975,7 +1442,6 @@ function applyTextObject(op, mod, obj) {
         }
       }
       if (openCol === -1) return;
-      // Search forward for close
       depth = 0;
       for (let c = openCol + 1; c < line.length; c++) {
         if (line[c] === open) depth++;
@@ -985,9 +1451,7 @@ function applyTextObject(op, mod, obj) {
         }
       }
     } else {
-      // Quote: find surrounding pair
       let left = col - 1, right = col + 1;
-      // if already on a quote, expand
       if (line[col] === open) { openCol = col; }
       else {
         while (left >= 0 && line[left] !== open) left--;
@@ -1055,7 +1519,6 @@ function handleInsert(key) {
   const line = state.lines[row] || '';
 
   if (key === 'CR') {
-    // Auto-indent
     const indent = (line.match(/^(\s*)/) || ['',''])[1];
     const before = line.slice(0, state.cursor.col);
     const after = line.slice(state.cursor.col);
@@ -1123,7 +1586,7 @@ function handleVisual(key) {
     const prevMode = state.mode;
     state.mode = 'normal';
     handleNormal(key);
-    if (state.mode === 'normal') state.mode = prevMode; // restore visual
+    if (state.mode === 'normal') state.mode = prevMode;
     return;
   }
 
@@ -1260,6 +1723,7 @@ function executeCommand(cmd) {
     } else {
       state.lines[state.cursor.row] = state.lines[state.cursor.row].replace(re, to);
     }
+    state.usedSubstitute = true;
     flashMessage('Substitution complete');
     return;
   }
@@ -1273,7 +1737,6 @@ function playMacro(reg, count) {
   state.macroPlayed = true;
   for (let c = 0; c < count; c++) {
     for (const k of keys) {
-      // Simulate key dispatch without re-entering macro recording logic
       const prevRec = state.recording;
       state.recording = null;
       switch (state.mode) {
@@ -1333,11 +1796,8 @@ function motionWordFwd(big) {
   let ln = state.lines[row] || '';
   const isW = big ? c => !/\s/.test(c) : c => /\w/.test(c);
   col++;
-  // skip current word chars
   while (col < ln.length && isW(ln[col])) col++;
-  // skip whitespace
   while (col < ln.length && /\s/.test(ln[col])) col++;
-  // wrap to next line
   if (col >= ln.length && row < state.lines.length - 1) { row++; col = 0; }
   state.cursor = { row, col: Math.min(col, Math.max(0, (state.lines[row]||'').length - 1)) };
 }
@@ -1398,7 +1858,6 @@ function repeatFt(same, count = 1) {
 }
 
 function finishOpAtCursor(op) {
-  // Called after f/t motion when op was pending
   state.submode = 'normal';
   state.pendingOp = null;
 }
@@ -1462,7 +1921,7 @@ function searchWord(dir) {
   const before = ln.slice(0, col + 1).match(/\w+$/);
   if (!before) return;
   const after = ln.slice(col).match(/^\w*/);
-  const word = before[0].slice(0, -after[0].length) + after[0]; // might be overkill
+  const word = before[0].slice(0, -after[0].length) + after[0];
   const m = ln.slice(0, col + 1).match(/\w+$/);
   if (!m) return;
   const start = col + 1 - m[0].length;
@@ -1479,7 +1938,6 @@ function indentRange(r1, r2, dir) {
 }
 
 function autoIndentRange(r1, r2) {
-  // Simple: match indent of previous non-empty line
   for (let r = r1; r <= Math.min(r2, state.lines.length-1); r++) {
     let refRow = r - 1;
     while (refRow > 0 && state.lines[refRow].trim() === '') refRow--;
@@ -1560,8 +2018,6 @@ function redo() {
 // --- DOT REPEAT ---
 let lastAction = null;
 function dotRepeat() {
-  // Simple: re-run last saveUndo-triggering action
-  // We track this by wrapping the main insert session
   flashMessage('. (dot repeat — limited in browser)');
 }
 
@@ -1582,6 +2038,7 @@ function uppercaseMotion() {
 function consumeCount() {
   const n = state.countStr ? parseInt(state.countStr, 10) : 1;
   state.countStr = '';
+  if (n > 1) state.usedCountPrefix = true;
   return Math.max(1, n);
 }
 
