@@ -9,6 +9,7 @@ const EXERCISES = [
   {
     category: "Navigation",
     title: "Basic hjkl Navigation",
+    difficulty: 1,
     filename: "navigation.txt",
     goal: "Move to the word <span class='goal'>TARGET</span> using only h, j, k, l keys.",
     hint: "Press <kbd>j</kbd> to go down, <kbd>l</kbd> to go right. No arrow keys!",
@@ -30,6 +31,7 @@ const EXERCISES = [
   {
     category: "Navigation",
     title: "Word Jumps: w, b, e",
+    difficulty: 1,
     filename: "words.txt",
     goal: "Jump to the word <span class='goal'>DESTINATION</span> using <kbd>w</kbd> or <kbd>b</kbd>.",
     hint: "Press <kbd>w</kbd> to jump forward one word at a time. Much faster than holding l!",
@@ -47,6 +49,7 @@ const EXERCISES = [
   {
     category: "Navigation",
     title: "Line Motions: 0, ^, $",
+    difficulty: 1,
     filename: "lines.txt",
     goal: "Reach the <span class='goal'>END</span> marker using <kbd>$</kbd>, then return to start with <kbd>0</kbd>.",
     hint: "Press <kbd>$</kbd> to jump to end of line, <kbd>0</kbd> for absolute start, <kbd>^</kbd> for first non-blank.",
@@ -60,6 +63,7 @@ const EXERCISES = [
   {
     category: "Navigation",
     title: "File Navigation: gg, G",
+    difficulty: 2,
     filename: "bigfile.txt",
     goal: "Jump to the bottom with <span class='goal'>G</span>, then back to the top with <span class='goal'>gg</span>.",
     hint: "Press <kbd>G</kbd> (Shift+g) for last line, <kbd>gg</kbd> for first line.",
@@ -76,6 +80,7 @@ const EXERCISES = [
   {
     category: "Navigation",
     title: "f and t Jumps",
+    difficulty: 2,
     filename: "jumps.txt",
     goal: "Use <span class='goal'>f</span> at least twice to jump to characters on a line.",
     hint: "Press <kbd>f</kbd> then a character to jump TO it. Press <kbd>;</kbd> to repeat.",
@@ -90,6 +95,7 @@ const EXERCISES = [
   {
     category: "Navigation",
     title: "Half-Page Scrolling",
+    difficulty: 2,
     filename: "scroll.txt",
     goal: "Scroll down with <span class='goal'>Ctrl+d</span> then back up with <span class='goal'>Ctrl+u</span>.",
     hint: "Hold Ctrl and press <kbd>d</kbd> to scroll down half a page, <kbd>u</kbd> to scroll up.",
@@ -107,6 +113,7 @@ const EXERCISES = [
   {
     category: "Navigation",
     title: "Bracket Matching: %",
+    difficulty: 2,
     filename: "brackets.txt",
     goal: "Use <span class='goal'>%</span> to jump between matching brackets.",
     hint: "Place cursor on any bracket and press <kbd>%</kbd> to jump to its match.",
@@ -124,6 +131,7 @@ const EXERCISES = [
   {
     category: "Navigation",
     title: "Screen Positions: H, M, L",
+    difficulty: 3,
     filename: "screen.txt",
     goal: "Jump to top with <span class='goal'>H</span>, middle with <span class='goal'>M</span>, and bottom with <span class='goal'>L</span>.",
     hint: "<kbd>H</kbd> = top of screen, <kbd>M</kbd> = middle, <kbd>L</kbd> = bottom. No scrolling needed!",
@@ -144,6 +152,7 @@ const EXERCISES = [
   {
     category: "Insert & Edit",
     title: "Insert Mode: i, o",
+    difficulty: 1,
     filename: "insert.txt",
     goal: "Add the text <span class='goal'>INSERTED</span> anywhere in the file using Insert mode.",
     hint: "Press <kbd>i</kbd> to enter Insert mode, type INSERTED, then press <kbd>Esc</kbd> to return to Normal.",
@@ -158,6 +167,7 @@ const EXERCISES = [
   {
     category: "Insert & Edit",
     title: "Append: a, A, I",
+    difficulty: 1,
     filename: "append.txt",
     goal: "Use <span class='goal'>A</span> to append text to the end of an incomplete line.",
     hint: "<kbd>A</kbd> jumps to end of line and enters Insert mode. <kbd>I</kbd> goes to the start.",
@@ -173,6 +183,7 @@ const EXERCISES = [
   {
     category: "Insert & Edit",
     title: "Open New Lines: o, O",
+    difficulty: 2,
     filename: "newlines.txt",
     goal: "Use <span class='goal'>o</span> to open a line below and type something, then <span class='goal'>O</span> above.",
     hint: "<kbd>o</kbd> opens a line below and enters Insert mode. <kbd>O</kbd> opens a line above.",
@@ -189,6 +200,7 @@ const EXERCISES = [
   {
     category: "Insert & Edit",
     title: "Replace Char: r",
+    difficulty: 2,
     filename: "replace_char.txt",
     goal: "Fix the typos by pressing <span class='goal'>r</span> then the correct character.",
     hint: "<kbd>r</kbd> replaces the char under cursor without entering Insert mode.",
@@ -205,6 +217,7 @@ const EXERCISES = [
   {
     category: "Insert & Edit",
     title: "Join Lines: J",
+    difficulty: 2,
     filename: "join.txt",
     goal: "Join the first three lines into one sentence using <span class='goal'>J</span>.",
     hint: "Press <kbd>J</kbd> to join the current line with the line below. Use <kbd>3J</kbd> to join 3 at once.",
@@ -220,6 +233,7 @@ const EXERCISES = [
   {
     category: "Insert & Edit",
     title: "Replace Mode: R",
+    difficulty: 3,
     filename: "replace_mode.txt",
     goal: "Overwrite the dashes with text using <span class='goal'>R</span> (Replace mode).",
     hint: "<kbd>R</kbd> enters Replace mode — typing overwrites characters instead of inserting.",
@@ -237,6 +251,7 @@ const EXERCISES = [
   {
     category: "Delete & Change",
     title: "Delete Lines: dd",
+    difficulty: 1,
     filename: "delete.txt",
     goal: "Delete <span class='goal'>all</span> lines that say DELETE THIS LINE using <kbd>dd</kbd>.",
     hint: "Move to the target line with j/k, then press <kbd>dd</kbd> to delete it. Repeat for each.",
@@ -253,6 +268,7 @@ const EXERCISES = [
   {
     category: "Delete & Change",
     title: "Delete with Motion: dw, d$",
+    difficulty: 2,
     filename: "dmotion.txt",
     goal: "Use <span class='goal'>dw</span> to delete a word and <span class='goal'>d$</span> to delete to end of line.",
     hint: "<kbd>dw</kbd> deletes from cursor to next word. <kbd>d$</kbd> deletes to end of line.",
@@ -269,6 +285,7 @@ const EXERCISES = [
   {
     category: "Delete & Change",
     title: "Change Word: cw, ciw",
+    difficulty: 2,
     filename: "change.txt",
     goal: "Change every <span class='goal'>WRONG</span> to something else using <kbd>cw</kbd> or <kbd>ciw</kbd>.",
     hint: "<kbd>cw</kbd> changes from cursor to end of word. <kbd>ciw</kbd> changes the whole word regardless of cursor position.",
@@ -284,6 +301,7 @@ const EXERCISES = [
   {
     category: "Delete & Change",
     title: "Delete Char: x",
+    difficulty: 2,
     filename: "xdelete.txt",
     goal: "Fix the doubled letters using <span class='goal'>x</span> to delete the extra character.",
     hint: "<kbd>x</kbd> deletes the character under cursor. Navigate to the extra letter and press x.",
@@ -301,6 +319,7 @@ const EXERCISES = [
   {
     category: "Delete & Change",
     title: "Change to EOL: C and D",
+    difficulty: 3,
     filename: "ceol.txt",
     goal: "Use <span class='goal'>D</span> to delete to end of line, <span class='goal'>C</span> to change to end.",
     hint: "<kbd>D</kbd> deletes from cursor to EOL. <kbd>C</kbd> does the same then enters Insert mode.",
@@ -319,6 +338,7 @@ const EXERCISES = [
   {
     category: "Yank & Paste",
     title: "Yank & Paste: yy, p",
+    difficulty: 2,
     filename: "paste.txt",
     goal: "Copy line 1 with <span class='goal'>yy</span>, then paste a duplicate anywhere below it.",
     hint: "On line 1 press <kbd>yy</kbd> to yank it, then navigate and press <kbd>p</kbd> to paste.",
@@ -334,6 +354,7 @@ const EXERCISES = [
   {
     category: "Yank & Paste",
     title: "Paste Before: P",
+    difficulty: 2,
     filename: "paste_before.txt",
     goal: "Yank the last line and paste it <span class='goal'>before</span> the target using <kbd>P</kbd>.",
     hint: "<kbd>p</kbd> pastes after the cursor line. <kbd>P</kbd> pastes before it.",
@@ -352,6 +373,7 @@ const EXERCISES = [
   {
     category: "Yank & Paste",
     title: "Yank Word: yw",
+    difficulty: 3,
     filename: "yank_word.txt",
     goal: "Yank the word <span class='goal'>KEYWORD</span> with <kbd>yw</kbd> and paste it where marked.",
     hint: "<kbd>yw</kbd> yanks from cursor to end of the next word. Navigate and <kbd>p</kbd> to paste.",
@@ -369,6 +391,7 @@ const EXERCISES = [
   {
     category: "Visual Mode",
     title: "Visual Line: V + d",
+    difficulty: 2,
     filename: "visual.txt",
     goal: "Select and delete the line <span class='goal'>=== DELETE ME ===</span> using <kbd>V</kbd> then <kbd>d</kbd>.",
     hint: "Move to the target line, press <kbd>V</kbd> to select it, then <kbd>d</kbd> to delete.",
@@ -384,6 +407,7 @@ const EXERCISES = [
   {
     category: "Visual Mode",
     title: "Visual Char: v + y",
+    difficulty: 2,
     filename: "vchar.txt",
     goal: "Use <span class='goal'>v</span> to select just the word <span class='goal'>GRAB</span>, yank it, then paste.",
     hint: "Press <kbd>v</kbd> to start char-visual, use motion to select GRAB, press <kbd>y</kbd> to yank, then <kbd>p</kbd> to paste.",
@@ -398,6 +422,7 @@ const EXERCISES = [
   {
     category: "Visual Mode",
     title: "Visual Indent: V + >",
+    difficulty: 3,
     filename: "vindent.txt",
     goal: "Select the inner lines and indent them with <kbd>V</kbd> then <kbd>></kbd>.",
     hint: "Press <kbd>V</kbd> then <kbd>j</kbd> to select multiple lines, then <kbd>></kbd> to indent them.",
@@ -416,6 +441,7 @@ const EXERCISES = [
   {
     category: "Visual Mode",
     title: "Visual Uppercase: V + U",
+    difficulty: 3,
     filename: "vcase.txt",
     goal: "Select the first two lines and uppercase them with <span class='goal'>U</span>.",
     hint: "Press <kbd>V</kbd> to select lines, then <kbd>U</kbd> to uppercase, <kbd>u</kbd> to lowercase.",
@@ -434,6 +460,7 @@ const EXERCISES = [
   {
     category: "Text Objects",
     title: "Text Objects: ci\"",
+    difficulty: 2,
     filename: "textobj.txt",
     goal: "Change the word inside quotes using <span class='goal'>ci\"</span>.",
     hint: "Place cursor inside or near the quoted text, then type <kbd>ci\"</kbd> to change it.",
@@ -450,6 +477,7 @@ const EXERCISES = [
   {
     category: "Text Objects",
     title: "Change Inner Word: ciw",
+    difficulty: 3,
     filename: "ciw.txt",
     goal: "Use <span class='goal'>ciw</span> to replace every <span class='goal'>OLDWORD</span> without moving to its start.",
     hint: "<kbd>ciw</kbd> works from anywhere inside a word — no need to navigate to the first letter.",
@@ -465,6 +493,7 @@ const EXERCISES = [
   {
     category: "Text Objects",
     title: "Delete Around Word: daw",
+    difficulty: 3,
     filename: "daw.txt",
     goal: "Use <span class='goal'>daw</span> to delete <span class='goal'>REMOVE</span> including surrounding space.",
     hint: "<kbd>daw</kbd> deletes the word AND surrounding whitespace — cleaner than <kbd>dw</kbd>.",
@@ -480,6 +509,7 @@ const EXERCISES = [
   {
     category: "Text Objects",
     title: "Change Inside Parens: ci(",
+    difficulty: 3,
     filename: "ci_paren.txt",
     goal: "Change the arguments inside each function call using <span class='goal'>ci(</span>.",
     hint: "Put cursor anywhere between the parens, type <kbd>ci(</kbd> to delete contents and enter Insert mode.",
@@ -496,6 +526,7 @@ const EXERCISES = [
   {
     category: "Text Objects",
     title: "Delete Paragraph: dap",
+    difficulty: 3,
     filename: "dap.txt",
     goal: "Delete the second paragraph using <span class='goal'>dap</span>.",
     hint: "Place cursor anywhere inside a paragraph and type <kbd>dap</kbd> to delete the whole paragraph.",
@@ -516,6 +547,7 @@ const EXERCISES = [
   {
     category: "Search & Replace",
     title: "Search Forward: /",
+    difficulty: 2,
     filename: "search.txt",
     goal: "Search for <span class='goal'>needle</span> and navigate through at least 3 matches using <kbd>n</kbd>.",
     hint: "Type <kbd>/needle</kbd> then Enter to search. Press <kbd>n</kbd> to jump to the next match.",
@@ -533,6 +565,7 @@ const EXERCISES = [
   {
     category: "Search & Replace",
     title: "Word Search: *",
+    difficulty: 2,
     filename: "star.txt",
     goal: "Use <span class='goal'>*</span> to search for the word under the cursor.",
     hint: "Place cursor on any word and press <kbd>*</kbd> to find all occurrences. Press <kbd>n</kbd> to cycle.",
@@ -549,6 +582,7 @@ const EXERCISES = [
   {
     category: "Search & Replace",
     title: "Line Substitution: :s",
+    difficulty: 3,
     filename: "subst.txt",
     goal: "Replace 'fox' with 'cat' on the current line using <span class='goal'>:s/fox/cat/</span>.",
     hint: "Type <kbd>:s/fox/cat/</kbd> — this replaces the first match on the current line.",
@@ -564,6 +598,7 @@ const EXERCISES = [
   {
     category: "Search & Replace",
     title: "Global Substitute: :%s",
+    difficulty: 3,
     filename: "gsubst.txt",
     goal: "Replace <span class='goal'>all</span> occurrences of 'bad' with 'good' using <span class='goal'>:%s/bad/good/g</span>.",
     hint: "<kbd>:%s/bad/good/g</kbd> — % means all lines, g means all matches per line.",
@@ -581,6 +616,7 @@ const EXERCISES = [
   {
     category: "Undo & Repeat",
     title: "Undo & Redo: u, Ctrl+r",
+    difficulty: 2,
     filename: "undo.txt",
     goal: "Delete a line with <span class='goal'>dd</span>, undo with <span class='goal'>u</span>, redo with <span class='goal'>Ctrl+r</span>.",
     hint: "Press <kbd>dd</kbd> to delete, <kbd>u</kbd> to undo, <kbd>Ctrl+r</kbd> to redo.",
@@ -598,6 +634,7 @@ const EXERCISES = [
   {
     category: "Advanced",
     title: "Indentation: >>, <<",
+    difficulty: 3,
     filename: "indent.txt",
     goal: "Indent the inner lines using <span class='goal'>>></span> and remove indent with <span class='goal'><<</span>.",
     hint: "<kbd>>></kbd> indents the current line. <kbd><<</kbd> unindents. Use a count: <kbd>3>></kbd>.",
@@ -615,6 +652,7 @@ const EXERCISES = [
   {
     category: "Advanced",
     title: "Case Toggle: ~, gU, gu",
+    difficulty: 3,
     filename: "case.txt",
     goal: "Uppercase a line with <span class='goal'>gU</span>, lowercase with <span class='goal'>gu</span>, or toggle with <span class='goal'>~</span>.",
     hint: "<kbd>~</kbd> toggles one char. <kbd>gU</kbd> uppercases the current line. <kbd>gu</kbd> lowercases.",
@@ -630,6 +668,7 @@ const EXERCISES = [
   {
     category: "Advanced",
     title: "Count Prefixes",
+    difficulty: 2,
     filename: "counts.txt",
     goal: "Use <span class='goal'>count prefixes</span> to multiply commands: <kbd>5j</kbd>, <kbd>3w</kbd>, <kbd>2dd</kbd>.",
     hint: "Type a number before any motion or command to repeat it. <kbd>5j</kbd> moves down 5 lines at once.",
@@ -646,6 +685,7 @@ const EXERCISES = [
   {
     category: "Advanced",
     title: "Macros",
+    difficulty: 4,
     filename: "macros.txt",
     goal: "Record a macro with <span class='goal'>qa</span>, make a change, stop with <span class='goal'>q</span>, replay with <span class='goal'>@a</span>.",
     hint: "Press <kbd>qa</kbd> to start recording, make changes, <kbd>q</kbd> to stop, <kbd>@a</kbd> to replay.",
@@ -665,6 +705,7 @@ const EXERCISES = [
   {
     category: "Free Practice",
     title: "Free Practice",
+    difficulty: 0,
     filename: "scratch.lua",
     goal: "Free practice — try any commands you like! No goal to reach.",
     hint: "Try: <kbd>ciw</kbd> to change a word, <kbd>%</kbd> to jump between brackets, <kbd>V</kbd>+<kbd>></kbd> to indent.",
@@ -752,6 +793,16 @@ function freshState(ex) {
 
     // For status/feedback
     message: '',
+
+    // Additional tracking flags
+    usedParagraphJump: false,
+    usedGeMotion: false,
+    usedCC: false,
+    usedBackwardSearch: false,
+    usedCtrlWInsert: false,
+    usedDotRepeat: false,
+    usedMark: false,
+    marks: {},
   };
 }
 
@@ -879,6 +930,8 @@ function updateCmdLine() {
   if (state.submode === 'g') { el.textContent = prefix + 'g'; return; }
   if (state.submode === 'f_pending') { el.textContent = prefix + (state.pendingFCmd || 'f'); return; }
   if (state.submode === 'r_pending') { el.textContent = 'r'; return; }
+  if (state.submode === 'mark_set') { el.textContent = 'm'; return; }
+  if (state.submode === 'mark_jump') { el.textContent = "'"; return; }
   if (state.submode === 'macro_record_name') { el.textContent = 'q'; return; }
   if (state.submode === 'macro_play_name') { el.textContent = '@'; return; }
   if (state.pendingOp) {
@@ -946,8 +999,8 @@ function handleNormal(key) {
     state.submode = 'normal';
     const count = consumeCount();
     if (key === 'g') { gotoLine(0); state.visitedTop = true; }
-    else if (key === 'e') { for (let i=0;i<count;i++) motionGe(); }
-    else if (key === 'E') { for (let i=0;i<count;i++) motionGe(true); }
+    else if (key === 'e') { for (let i=0;i<count;i++) motionGe(); state.usedGeMotion = true; }
+    else if (key === 'E') { for (let i=0;i<count;i++) motionGe(true); state.usedGeMotion = true; }
     else if (key === 'j') moveRow(count);
     else if (key === 'k') moveRow(-count);
     else if (key === '_') { moveToLastNonBlank(); }
@@ -973,6 +1026,27 @@ function handleNormal(key) {
     state.fJumpCount++;
     // Apply pending op if any
     if (state.pendingOp) finishOpAtCursor(state.pendingOp);
+    return;
+  }
+
+  // --- Sub-state: mark set (m{letter}) ---
+  if (state.submode === 'mark_set') {
+    state.submode = 'normal';
+    if (/^[a-z]$/.test(key)) {
+      state.marks[key] = { row: state.cursor.row, col: state.cursor.col };
+    }
+    return;
+  }
+
+  // --- Sub-state: mark jump ('{letter}) ---
+  if (state.submode === 'mark_jump') {
+    state.submode = 'normal';
+    if (/^[a-z]$/.test(key) && state.marks[key]) {
+      state.cursor.row = state.marks[key].row;
+      state.cursor.col = state.marks[key].col;
+      state.usedMark = true;
+      clampCursor();
+    }
     return;
   }
 
@@ -1064,6 +1138,8 @@ function handleNormal(key) {
     case 'C-f': moveRow(visibleRows()); break;
     case 'C-b': moveRow(-visibleRows()); break;
     case '%': jumpMatchingBracket(); state.usedPercent = true; break;
+    case '{': jumpParagraphBwd(); state.usedParagraphJump = true; break;
+    case '}': jumpParagraphFwd(); state.usedParagraphJump = true; break;
     case 'f': state.submode = 'f_pending'; state.pendingFCmd = 'f'; state.countStr = String(count > 1 ? count : ''); break;
     case 'F': state.submode = 'f_pending'; state.pendingFCmd = 'F'; state.countStr = String(count > 1 ? count : ''); break;
     case 't': state.submode = 'f_pending'; state.pendingFCmd = 't'; state.countStr = String(count > 1 ? count : ''); break;
@@ -1214,7 +1290,7 @@ function handleNormal(key) {
 
     // Search
     case '/': state.mode = 'search'; state.searchDir = 1; state.cmdBuffer = ''; break;
-    case '?': state.mode = 'search'; state.searchDir = -1; state.cmdBuffer = ''; break;
+    case '?': state.mode = 'search'; state.searchDir = -1; state.cmdBuffer = ''; state.usedBackwardSearch = true; break;
     case 'n': for(let i=0;i<count;i++) { nextMatch(state.searchDir); state.nPresses++; } break;
     case 'N': for(let i=0;i<count;i++) nextMatch(-state.searchDir); break;
     case '*': searchWord(1); state.usedStar = true; break;
@@ -1241,6 +1317,9 @@ function handleNormal(key) {
     case '@': state.submode = 'macro_play_name'; break;
 
     // Scroll cursor centering
+    case 'm': state.submode = 'mark_set'; break;
+    case "'": state.submode = 'mark_jump'; break;
+
     case 'z': {
       const editorEl = document.getElementById('editor-lines');
       const curEl = editorEl.querySelectorAll('.editor-line')[state.cursor.row];
@@ -1269,7 +1348,7 @@ function handleOpMotion(key) {
     state.pendingObjMod = null;
     if (op === 'd') { for(let i=0;i<count;i++) deleteLine(state.cursor.row); }
     else if (op === 'y') { yankLines(state.cursor.row, count); }
-    else if (op === 'c') { saveUndo(); for(let i=0;i<count;i++) deleteLine(state.cursor.row); state.mode = 'insert'; state.cursor.col = 0; }
+    else if (op === 'c') { saveUndo(); for(let i=0;i<count;i++) deleteLine(state.cursor.row); state.mode = 'insert'; state.cursor.col = 0; state.usedCC = true; }
     else if (op === '>') { saveUndo(); indentRange(state.cursor.row, state.cursor.row + count - 1, 1); }
     else if (op === '<') { saveUndo(); indentRange(state.cursor.row, state.cursor.row + count - 1, -1); }
     else if (op === '=') { saveUndo(); autoIndentRange(state.cursor.row, state.cursor.row + count - 1); }
@@ -1514,6 +1593,17 @@ function handleInsert(key) {
     return;
   }
   if (key === 'C-c') { state.mode = 'normal'; return; }
+  if (key === 'C-w') {
+    const r = state.cursor.row;
+    const ln = state.lines[r] || '';
+    let c = state.cursor.col;
+    while (c > 0 && /\s/.test(ln[c - 1])) c--;
+    while (c > 0 && /\S/.test(ln[c - 1])) c--;
+    state.lines[r] = ln.slice(0, c) + ln.slice(state.cursor.col);
+    state.cursor.col = c;
+    state.usedCtrlWInsert = true;
+    return;
+  }
 
   const row = state.cursor.row;
   const line = state.lines[row] || '';
@@ -1790,6 +1880,21 @@ function moveToLastNonBlank() {
   state.cursor.col = Math.max(0, c);
 }
 
+// --- PARAGRAPH MOTIONS ---
+function jumpParagraphFwd() {
+  let r = state.cursor.row + 1;
+  while (r < state.lines.length && state.lines[r].trim() !== '') r++;
+  state.cursor.row = Math.min(r, state.lines.length - 1);
+  clampCursor();
+}
+
+function jumpParagraphBwd() {
+  let r = state.cursor.row - 1;
+  while (r > 0 && state.lines[r].trim() !== '') r--;
+  state.cursor.row = Math.max(0, r);
+  clampCursor();
+}
+
 // --- WORD MOTIONS ---
 function motionWordFwd(big) {
   let { row, col } = state.cursor;
@@ -2018,6 +2123,7 @@ function redo() {
 // --- DOT REPEAT ---
 let lastAction = null;
 function dotRepeat() {
+  state.usedDotRepeat = true;
   flashMessage('. (dot repeat — limited in browser)');
 }
 
