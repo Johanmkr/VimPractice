@@ -128,19 +128,45 @@
     .print-btn:hover { transform: scale(1.08); }
 
     @media print {
+      @page { margin: 1.2cm; }
+
+      :root {
+        --bg: #fff;
+        --bg2: #f7f7f7;
+        --bg3: #f2f2f2;
+        --bg4: #e8e8e8;
+        --fg: #111;
+        --fg2: #333;
+        --fg3: #666;
+        --accent: #1a56db;
+        --accent2: #6a1b9a;
+        --green: #2e7d32;
+        --teal: #006064;
+        --red: #880e4f;
+        --orange: #c62828;
+        --yellow: #b45309;
+        --border: #ccc;
+      }
+
       nav, .print-btn, footer { display: none !important; }
-      body { background: white; color: black; }
-      .cheat-card { border-color: #ccc; break-inside: avoid; }
+
+      .page-header { padding: 0 0 0.8rem; border-bottom: 2px solid #333; margin-bottom: 1.2rem; }
+
+      .cheat-card { break-inside: avoid; }
+
       .cheat-card-header.nav    { background: #e8f0fe; color: #1a56db; }
       .cheat-card-header.insert { background: #e8f5e9; color: #2e7d32; }
       .cheat-card-header.edit   { background: #fff3e0; color: #e65100; }
       .cheat-card-header.visual { background: #f3e5f5; color: #6a1b9a; }
       .cheat-card-header.search { background: #e0f7fa; color: #006064; }
-      .cheat-card-header.cmd    { background: #fffde7; color: #f57f17; }
+      .cheat-card-header.cmd    { background: #fffde7; color: #b45309; }
       .cheat-card-header.adv    { background: #fce4ec; color: #880e4f; }
-      .ck { color: #c62828; }
-      .ck kbd { color: #c62828; border-color: #ccc; background: #f5f5f5; }
-      .cv { color: #333; }
+
+      .callout { background: #f0f4ff; }
+      .callout.tip { background: #f1f8f1; }
+
+      code { background: #efefef; color: #006064; }
+      pre { background: #f7f7f7; color: #333; }
     }
   </style>
 </head>
