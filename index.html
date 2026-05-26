@@ -525,6 +525,50 @@
     }
     .vt-status .vts-file { opacity: 0.65; font-weight: 400; }
 
+    /* ════════════════════════════════════════════════════
+       ILLUSTRATION: COPILOT — ghost text suggestion
+    ════════════════════════════════════════════════════ */
+    .vis-copilot {
+      width: 220px;
+      font-size: 0.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .vc-line {
+      display: flex;
+      align-items: center;
+      height: 19px;
+      white-space: nowrap;
+    }
+    .vc-code  { color: var(--fg); }
+    .vc-ghost { color: var(--fg3); opacity: 0; transition: opacity 0.3s; }
+    @keyframes ghost-in {
+      0%,15%  { opacity: 0; }
+      35%,75% { opacity: 1; }
+      90%,100%{ opacity: 0; }
+    }
+    .hcard:hover .vc-ghost { animation: ghost-in 2.6s ease-in-out infinite; }
+    .vc-cursor-block {
+      display: inline-block;
+      width: 7px; height: 13px;
+      background: var(--fg);
+      flex-shrink: 0;
+      animation: rec-blink 1.1s step-start infinite;
+    }
+    .vc-tab-hint {
+      font-size: 0.58rem;
+      color: var(--fg3);
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 0.08rem 0.35rem;
+      opacity: 0;
+      align-self: flex-start;
+      margin-top: 4px;
+    }
+    .hcard:hover .vc-tab-hint { animation: ghost-in 2.6s 0.2s ease-in-out infinite; }
+
     /* ── Responsive ────────────────────────────────────── */
     @media (max-width: 700px) {
       .home-grid { grid-template-columns: 1fr; padding: 0 1rem 3rem; }
@@ -542,6 +586,7 @@
     <li><a href="vs-vim.html">Vim vs Neovim</a></li>
     <li><a href="vscode-to-nvim.html">VS Code → Nvim</a></li>
     <li><a href="tutorial.html">Tutorial</a></li>
+    <li><a href="copilot.html">Copilot</a></li>
     <li><a href="cheatsheet.html">Cheatsheet</a></li>
     <li><a href="practice.html">Practice</a></li>
   </ul>
@@ -732,6 +777,32 @@
         <span class="hc-tag">Printable</span>
       </div>
       <div class="hc-cta">Open cheatsheet <span class="hc-arr">→</span></div>
+    </div>
+  </a>
+
+  <!-- ── COPILOT ──────────────────────────────────────── -->
+  <a href="copilot.html" class="hcard" style="--ca: var(--green)">
+    <div class="hc-vis">
+      <div class="vis-copilot">
+        <div class="vc-line">
+          <span class="vc-code">def greet(</span><span class="vc-cursor-block"></span><span class="vc-ghost">name: str) -> str:</span>
+        </div>
+        <div class="vc-line">
+          <span class="vc-ghost">&nbsp;&nbsp;return f"Hello, {name}!"</span>
+        </div>
+        <div class="vc-tab-hint">Tab to accept</div>
+      </div>
+    </div>
+    <div class="hc-body">
+      <div class="hc-title">GitHub Copilot</div>
+      <div class="hc-desc">Add AI code completion to Neovim — install <code>copilot.lua</code>, authenticate, and integrate with nvim-cmp.</div>
+      <div class="hc-tags">
+        <span class="hc-tag">AI</span>
+        <span class="hc-tag">Copilot</span>
+        <span class="hc-tag">Setup</span>
+        <span class="hc-tag">nvim-cmp</span>
+      </div>
+      <div class="hc-cta">Set up Copilot <span class="hc-arr">→</span></div>
     </div>
   </a>
 
