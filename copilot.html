@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Guide — GitHub Copilot</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .step-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.4rem;
+    }
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 700;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .step-content h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--fg);
+      margin-bottom: 0.3rem;
+    }
+    .step-content p {
+      color: var(--fg2);
+      font-size: 0.9rem;
+      margin: 0.3rem 0;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0 1.5rem;
+    }
+    .option-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+    }
+    .option-card.recommended { border-color: var(--accent); }
+    .option-title {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+    }
+    .option-sub {
+      font-size: 0.75rem;
+      color: var(--fg3);
+      margin-bottom: 0.8rem;
+    }
+    .rec-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: var(--bg);
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+    }
+
+    .kb-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .kb-table tr { border-bottom: 1px solid var(--bg4); }
+    .kb-table tr:last-child { border-bottom: none; }
+    .kb-table td {
+      padding: 0.38rem 0.5rem 0.38rem 0;
+      font-size: 0.875rem;
+      vertical-align: top;
+    }
+    .kb-table td:first-child { width: 200px; white-space: nowrap; }
+    .kb-table td:last-child { color: var(--fg2); }
+
+    .kb-group-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--fg3);
+      margin: 1.2rem 0 0.6rem;
+    }
+    .kb-group-title:first-child { margin-top: 0; }
+
+    @media (max-width: 700px) {
+      .option-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="basics.html">Basics</a></li>
+    <li><a href="advanced.html">Advanced</a></li>
+    <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="vscode-to-nvim.html">VS Code → Nvim</a></li>
+    <li><a href="tutorial.html">Tutorial</a></li>
+    <li><a href="copilot.html" class="active">Copilot</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+    <li><a href="practice.html">Practice</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <h1>&#129302; GitHub Copilot in Neovim</h1>
+    <p>Install, configure, and use AI-powered code completion — from first setup to daily use.</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- WHAT IS COPILOT -->
+  <div class="feature-section">
+    <h2>&#9656; What is GitHub Copilot?</h2>
+    <p>GitHub Copilot is an AI code completion tool that suggests entire lines or blocks of code as you type, based on context from your current file and comments. In Neovim, suggestions appear as greyed-out ghost text — press <kbd>Tab</kbd> to accept or keep typing to ignore.</p>
+    <div class="callout tip" style="margin-top:1rem;">
+      <strong>Free tier available:</strong> Individual developers get a limited free plan. Enable it at your GitHub account settings under <em>Copilot</em>, then follow the authentication steps below.
+    </div>
+  </div>
+
+  <!-- PREREQUISITES -->
+  <div class="feature-section">
+    <h2>&#9656; Prerequisites</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:0.8rem;">
+      <div class="card">
+        <div class="card-title">GitHub Copilot Access</div>
+        <p class="key-desc">Free or paid plan activated at <code>github.com/settings/copilot</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Node.js 18+</div>
+        <p class="key-desc">Required by the language server backend. Check with <code>node --version</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Neovim 0.9+</div>
+        <p class="key-desc"><code>copilot.lua</code> requires 0.9+. The official <code>copilot.vim</code> works from 0.6+.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">A plugin manager</div>
+        <p class="key-desc">Examples below use <code>lazy.nvim</code>. Adapt as needed for packer or other managers.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSTALLATION -->
+  <div class="feature-section">
+    <h2>&#9656; Installation</h2>
+    <p style="color:var(--fg2);font-size:0.9rem;margin-bottom:1rem;">There are two plugins to choose from. <strong style="color:var(--fg)">copilot.lua</strong> is recommended for modern Neovim setups — it is written in pure Lua and integrates cleanly with nvim-cmp.</p>
+
+    <div class="option-grid">
+
+      <div class="option-card recommended">
+        <div class="option-title">copilot.lua <span class="rec-badge">Recommended</span></div>
+        <div class="option-sub">Pure Lua · nvim-cmp support · More configurable</div>
+        <pre>-- lazy.nvim
+{
+  "zbirenbaum/copilot.lua",
+  cmd   = "Copilot",
+  event = "InsertEnter",
+  opts  = {
+    suggestion = {
+      enabled     = true,
+      auto_trigger = true,
+      keymap = {
+        accept       = "&lt;Tab&gt;",
+        accept_word  = "&lt;C-Right&gt;",
+        next         = "&lt;M-]&gt;",
+        prev         = "&lt;M-[&gt;",
+        dismiss      = "&lt;C-]&gt;",
+      },
+    },
+    panel = { enabled = false },
+  },
+},</pre>
+      </div>
+
+      <div class="option-card">
+        <div class="option-title">copilot.vim</div>
+        <div class="option-sub">Official · Vimscript · Simpler, fewer options</div>
+        <pre>-- lazy.nvim
+{
+  "github/copilot.vim",
+  -- keymaps are set automatically:
+  -- Tab         → accept
+  -- Ctrl+]      → dismiss
+  -- Alt+] / Alt+[ → next/prev
+}</pre>
+        <div class="callout warn" style="margin-top:0.8rem;font-size:0.82rem;">
+          <strong>Tab conflict:</strong> <code>copilot.vim</code> maps <kbd>Tab</kbd> globally in insert mode, which often conflicts with snippet and completion plugins. See the Tab section below.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- AUTHENTICATION -->
+  <div class="feature-section">
+    <h2>&#9656; Authentication</h2>
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h3>Run <code>:Copilot setup</code></h3>
+        <p>Neovim prints a one-time device code and opens (or tells you to open) <code>github.com/login/device</code>.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h3>Enter the code in your browser</h3>
+        <p>Paste the code shown in Neovim into the GitHub device page and click <em>Authorise GitHub Copilot</em>.</p>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h3>Verify with <code>:Copilot status</code></h3>
+        <p>Should print <code>Copilot: Ready</code>. If not, confirm Node.js is on your PATH (<code>node --version</code>) and your subscription is active.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="feature-section">
+    <h2>&#9656; How It Works in the Editor</h2>
+    <p style="color:var(--fg2);font-size:0.9rem;margin-bottom:1rem;">After a brief pause while typing, Copilot sends your file context to GitHub's servers and streams back a suggestion, shown as ghost text after your cursor.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.8rem;">
+      <div class="card">
+        <div class="card-title">Ghost text</div>
+        <p class="key-desc">The suggestion appears inline in grey. Press <kbd>Tab</kbd> to accept the full suggestion or <kbd>Ctrl+Right</kbd> to accept word by word.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Multiple suggestions</div>
+        <p class="key-desc">Copilot generates several alternatives. Cycle through them with <kbd>Alt+]</kbd> / <kbd>Alt+[</kbd>. Press <kbd>Ctrl+]</kbd> to dismiss all.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Context window</div>
+        <p class="key-desc">Copilot reads the content of your current file, open buffers, and comments. Descriptive comments and function signatures give better results.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Suggestions panel</div>
+        <p class="key-desc">Run <code>:Copilot panel</code> (copilot.vim) to open a split showing up to 10 alternative completions at once.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- KEYBINDINGS -->
+  <div class="feature-section">
+    <h2>&#9656; Keybindings</h2>
+    <div class="two-col">
+      <div>
+        <div class="kb-group-title">Suggestion keys (insert mode)</div>
+        <table class="kb-table">
+          <tr><td><kbd>Tab</kbd></td><td>Accept full suggestion</td></tr>
+          <tr><td><kbd>Ctrl+Right</kbd></td><td>Accept next word only (copilot.lua)</td></tr>
+          <tr><td><kbd>Ctrl+Alt+]</kbd></td><td>Accept next word only (copilot.vim)</td></tr>
+          <tr><td><kbd>Alt+]</kbd></td><td>Next suggestion</td></tr>
+          <tr><td><kbd>Alt+[</kbd></td><td>Previous suggestion</td></tr>
+          <tr><td><kbd>Ctrl+]</kbd></td><td>Dismiss suggestion</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="kb-group-title">Commands (normal mode)</div>
+        <table class="kb-table">
+          <tr><td><kbd>:Copilot setup</kbd></td><td>Authenticate with GitHub</td></tr>
+          <tr><td><kbd>:Copilot status</kbd></td><td>Check connection status</td></tr>
+          <tr><td><kbd>:Copilot enable</kbd></td><td>Enable globally</td></tr>
+          <tr><td><kbd>:Copilot disable</kbd></td><td>Disable globally</td></tr>
+          <tr><td><kbd>:Copilot panel</kbd></td><td>Open alternatives panel</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- nvim-cmp integration -->
+  <div class="feature-section">
+    <h2>&#9656; nvim-cmp Integration</h2>
+    <p style="color:var(--fg2);font-size:0.9rem;margin-bottom:0.8rem;">Add <code>copilot-cmp</code> to surface Copilot suggestions inside the nvim-cmp popup menu alongside LSP and snippet completions.</p>
+    <pre>-- lazy.nvim — add alongside copilot.lua
+{
+  "zbirenbaum/copilot-cmp",
+  dependencies = "zbirenbaum/copilot.lua",
+  config = true,
+},
+
+-- In your cmp config, add "copilot" as a source:
+require("cmp").setup({
+  sources = cmp.config.sources({
+    { name = "copilot",  group_index = 2 },
+    { name = "nvim_lsp", group_index = 2 },
+    { name = "luasnip",  group_index = 2 },
+    { name = "buffer",   group_index = 3 },
+  }),
+})</pre>
+    <div class="callout tip" style="margin-top:0.8rem;">
+      <strong>Tip:</strong> When using copilot-cmp, disable inline ghost text to avoid showing the same suggestion twice — set <code>suggestion = &#123; enabled = false &#125;</code> in your copilot.lua opts.
+    </div>
+  </div>
+
+  <!-- TAB CONFLICT -->
+  <div class="feature-section">
+    <h2>&#9656; Resolving Tab Conflicts</h2>
+    <p style="color:var(--fg2);font-size:0.9rem;margin-bottom:0.8rem;">Copilot, LuaSnip, and nvim-cmp all compete for <kbd>Tab</kbd>. This mapping checks each in priority order and falls back to a literal tab.</p>
+    <pre>vim.keymap.set("i", "&lt;Tab&gt;", function()
+  local copilot  = require("copilot.suggestion")
+  local luasnip  = require("luasnip")
+  if copilot.is_visible() then
+    copilot.accept()
+  elseif luasnip.expand_or_jumpable() then
+    luasnip.expand_or_jump()
+  else
+    return "&lt;Tab&gt;"
+  end
+end, { expr = true, silent = true })</pre>
+  </div>
+
+  <!-- FILETYPE DISABLE -->
+  <div class="feature-section">
+    <h2>&#9656; Disabling for Specific Filetypes</h2>
+    <pre>-- In copilot.lua opts:
+filetypes = {
+  markdown  = false,  -- avoid leaking prose
+  yaml      = false,
+  [".env"]  = false,  -- never suggest in env files
+  ["*"]     = true,   -- enable everywhere else
+},</pre>
+    <div class="callout warn" style="margin-top:0.8rem;">
+      <strong>Security:</strong> Always disable Copilot for <code>.env</code> files, secrets, and private configs. File contents are sent to GitHub's API with each request.
+    </div>
+  </div>
+
+  <!-- TIPS -->
+  <div class="feature-section">
+    <h2>&#9656; Tips for Better Suggestions</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.8rem;">
+      <div class="card">
+        <div class="card-title">Write descriptive comments</div>
+        <p class="key-desc">A comment like <code>-- parse ISO date string and return table</code> produces far better completions than an empty function body.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Name things clearly</div>
+        <p class="key-desc">Copilot infers intent from variable and function names. <code>parseUserInput</code> produces more relevant suggestions than <code>foo</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Open related files</div>
+        <p class="key-desc">Copilot uses open buffers as context. Keeping interface or type definition files open helps it match your project's patterns.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Use the panel for exploration</div>
+        <p class="key-desc"><code>:Copilot panel</code> shows up to 10 alternatives at once — useful when you want to see different approaches to a problem.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Neovim Guide &mdash; <a href="https://neovim.io" target="_blank">neovim.io</a> &mdash; <a href="practice.html">Practice Now</a></p>
+</footer>
+
+</body>
+</html>

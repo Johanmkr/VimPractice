@@ -240,6 +240,7 @@
     <li><a href="vs-vim.html">Vim vs Neovim</a></li>
     <li><a href="vscode-to-nvim.html">VS Code → Nvim</a></li>
     <li><a href="tutorial.html">Tutorial</a></li>
+    <li><a href="copilot.html">Copilot</a></li>
     <li><a href="cheatsheet.html" class="active">Cheatsheet</a></li>
     <li><a href="practice.html">Practice</a></li>
   </ul>
@@ -553,7 +554,65 @@
       </div>
     </div>
 
+    <!-- Copilot -->
+    <div class="cheat-card">
+      <div class="cheat-card-header adv">&#129302; GitHub Copilot</div>
+      <div class="cheat-card-body">
+        <p style="font-size:0.78rem;color:var(--fg3);margin-bottom:0.5rem;">Requires <code>github/copilot.vim</code> or <code>zbirenbaum/copilot.lua</code></p>
+        <div class="cheat-row"><span class="ck"><kbd>:Copilot setup</kbd></span><span class="cv">Authenticate with GitHub</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:Copilot enable</kbd></span><span class="cv">Enable Copilot</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:Copilot disable</kbd></span><span class="cv">Disable Copilot</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:Copilot status</kbd></span><span class="cv">Show current status</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>:Copilot panel</kbd></span><span class="cv">Open suggestions panel</span></div>
+        <div class="cheat-row" style="border-top:1px solid var(--border);margin-top:0.4rem;padding-top:0.4rem;"><span class="ck"><kbd>Tab</kbd></span><span class="cv">Accept suggestion</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+]</kbd></span><span class="cv">Dismiss suggestion</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Alt+]</kbd></span><span class="cv">Next suggestion</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Alt+[</kbd></span><span class="cv">Previous suggestion</span></div>
+        <div class="cheat-row"><span class="ck"><kbd>Ctrl+Alt+]</kbd></span><span class="cv">Accept next word only</span></div>
+      </div>
+    </div>
+
   </div><!-- end cheat-grid -->
+
+  <!-- COPILOT SETUP -->
+  <div class="section-h2">&#129302; GitHub Copilot Setup</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.5rem;margin-bottom:2rem;font-size:0.83rem;">
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem;">
+      <div style="color:var(--accent);font-weight:700;margin-bottom:0.4rem;">Option A — copilot.vim (official)</div>
+      <pre style="margin:0;font-size:0.75rem;">-- lazy.nvim
+{ "github/copilot.vim" }</pre>
+      <div style="color:var(--fg3);font-size:0.75rem;margin-top:0.4rem;">Then run <code>:Copilot setup</code></div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem;">
+      <div style="color:var(--accent);font-weight:700;margin-bottom:0.4rem;">Option B — copilot.lua (Lua, nvim-cmp)</div>
+      <pre style="margin:0;font-size:0.75rem;">-- lazy.nvim
+{ "zbirenbaum/copilot.lua",
+  opts = {
+    suggestion = { auto_trigger = true },
+  }
+}</pre>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem;">
+      <div style="color:var(--accent);font-weight:700;margin-bottom:0.4rem;">cmp integration (copilot.lua)</div>
+      <pre style="margin:0;font-size:0.75rem;">-- adds Copilot as a cmp source
+{ "zbirenbaum/copilot-cmp",
+  config = true
+}</pre>
+      <div style="color:var(--fg3);font-size:0.75rem;margin-top:0.4rem;">Then add <code>"copilot"</code> to cmp sources</div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:0.6rem 0.9rem;">
+      <div style="color:var(--accent);font-weight:700;margin-bottom:0.4rem;">Remap Tab (avoid conflicts)</div>
+      <pre style="margin:0;font-size:0.75rem;">vim.keymap.set("i", "&lt;Tab&gt;", function()
+  if require("copilot.suggestion")
+      .is_visible() then
+    require("copilot.suggestion")
+      .accept()
+  else
+    return "&lt;Tab&gt;"
+  end
+end, { expr = true })</pre>
+    </div>
+  </div>
 
   <!-- COUNTS -->
   <div class="section-h2">&#35; Counts &amp; Repetition</div>
