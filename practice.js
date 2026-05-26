@@ -1270,6 +1270,15 @@ function loadExercise(idx) {
   const ex = EXERCISES[idx];
   state = freshState(ex);
 
+  const diffNames = ['', 'Beginner', 'Easy', 'Intermediate', 'Hard', 'Expert'];
+  const diff = ex.difficulty || 0;
+  const diffEl = document.getElementById('task-difficulty');
+  if (diffEl) {
+    diffEl.innerHTML = diff > 0
+      ? `<span class="task-diff-badge diff-${diff}" title="Difficulty ${diff}/5 — ${diffNames[diff]}">${diff} — ${diffNames[diff]}</span>`
+      : '';
+  }
+
   document.getElementById('editor-filename').textContent = ex.filename;
   document.getElementById('task-instruction').innerHTML =
     `<span class="goal-label">Goal:</span> ${ex.goal}`;

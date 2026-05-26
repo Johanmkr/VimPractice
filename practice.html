@@ -295,6 +295,18 @@
       letter-spacing: 0.08em;
       color: var(--fg3);
       margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .task-diff-badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.05rem 0.38rem;
+      border-radius: 3px;
+      line-height: 1.6;
+      text-transform: none;
+      letter-spacing: 0;
     }
     .goal-label  { color: var(--teal); font-weight: 700; }
     .hint-label  { color: var(--yellow); }
@@ -537,7 +549,7 @@
     </div>
 
     <div class="task-panel">
-      <div class="task-panel-label">Exercise Goal</div>
+      <div class="task-panel-label">Exercise Goal <span id="task-difficulty"></span></div>
       <div id="task-instruction"></div>
     </div>
   </div>
@@ -562,7 +574,7 @@
       }
       const diff = ex.difficulty || 0;
       const badge = diff > 0
-        ? `<span class="difficulty-badge diff-${diff}">${diff}</span>`
+        ? `<span class="difficulty-badge diff-${diff}" title="Difficulty ${diff}/5 — ${diffLabels[diff]}">${diff}</span>`
         : '';
       const div = document.createElement('div');
       div.className = 'exercise-item' + (i === 0 ? ' active' : '');
