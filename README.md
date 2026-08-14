@@ -12,6 +12,7 @@ A static, interactive reference site for learning Neovim — hosted on GitHub Pa
 | **Basics** (`basics.html`) | Modes, motions, operators, and core commands |
 | **Advanced** (`advanced.html`) | Registers, macros, marks, folds, and more |
 | **Vim vs Neovim** (`vs-vim.html`) | What Neovim adds over classic Vim |
+| **LazyVim** (`lazyvim.html`) | Why and how to layer LazyVim on top of Neovim |
 | **VS Code → Nvim** (`vscode-to-nvim.html`) | Transition guide from VS Code to Neovim |
 | **Tutorial** (`tutorial.html`) | Step-by-step guide for new Vim users |
 | **Cheatsheet** (`cheatsheet.html`) | Quick-reference card for common keybindings |

@@ -569,6 +569,63 @@
     }
     .hcard:hover .vc-tab-hint { animation: ghost-in 2.6s 0.2s ease-in-out infinite; }
 
+    /* ════════════════════════════════════════════════════
+       ILLUSTRATION: GAME — arcade level path
+    ════════════════════════════════════════════════════ */
+    .vis-arcade {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .varc-row {
+      display: flex;
+      align-items: center;
+    }
+    .varc-node {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      background: var(--bg4);
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem;
+      color: var(--fg3);
+      flex-shrink: 0;
+    }
+    .varc-node.done {
+      background: var(--ca, var(--accent2));
+      border-color: var(--ca, var(--accent2));
+      color: var(--bg2);
+    }
+    .varc-node.current {
+      border-color: var(--ca, var(--accent2));
+      color: var(--ca, var(--accent2));
+    }
+    .varc-line {
+      width: 26px; height: 2px;
+      background: var(--border);
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .varc-line::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: var(--ca, var(--accent2));
+    }
+    @keyframes varc-fill { 0%,15% { left: -100%; } 65%,100% { left: 0; } }
+    @keyframes varc-pulse {
+      0%,100% { box-shadow: none; }
+      50%      { box-shadow: 0 0 0 4px rgba(187,154,247,0.18); }
+    }
+    .hcard:hover .varc-l1::after { animation: varc-fill 3s 0.2s ease-in-out infinite; }
+    .hcard:hover .varc-l2::after { animation: varc-fill 3s 0.7s ease-in-out infinite; }
+    .hcard:hover .varc-node.current { animation: varc-pulse 1.6s ease-in-out infinite; }
+
+    .varc-label { font-size: 0.62rem; color: var(--fg3); }
+
     /* ── Responsive ────────────────────────────────────── */
     @media (max-width: 700px) {
       .home-grid { grid-template-columns: 1fr; padding: 0 1rem 3rem; }
@@ -584,11 +641,13 @@
     <li><a href="basics.html">Basics</a></li>
     <li><a href="advanced.html">Advanced</a></li>
     <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="lazyvim.html">LazyVim</a></li>
     <li><a href="vscode-to-nvim.html">VS Code → Nvim</a></li>
     <li><a href="tutorial.html">Tutorial</a></li>
     <li><a href="copilot.html">Copilot</a></li>
     <li><a href="cheatsheet.html">Cheatsheet</a></li>
     <li><a href="practice.html">Practice</a></li>
+    <li><a href="game.html">Game</a></li>
   </ul>
 </nav>
 
@@ -697,6 +756,32 @@
         <span class="hc-tag">Config</span>
       </div>
       <div class="hc-cta">See the differences <span class="hc-arr">→</span></div>
+    </div>
+  </a>
+
+  <!-- ── LAZYVIM ──────────────────────────────────────── -->
+  <a href="lazyvim.html" class="hcard" style="--ca: var(--accent2)">
+    <div class="hc-vis">
+      <div class="vis-steps">
+        <div class="vs-steps-row">
+          <div class="vst-dot vst-d1" style="color:var(--orange);border-color:var(--orange);">V</div>
+          <div class="vst-line vst-l1"></div>
+          <div class="vst-dot vst-d2" style="color:var(--accent);border-color:var(--accent);">N</div>
+          <div class="vst-line vst-l2"></div>
+          <div class="vst-dot vst-d3" style="background:var(--accent2);border-color:var(--accent2);color:var(--bg2);">L</div>
+        </div>
+        <div class="vst-label">Vim → Neovim → LazyVim</div>
+      </div>
+    </div>
+    <div class="hc-body">
+      <div class="hc-title">LazyVim</div>
+      <div class="hc-desc">The next step after Neovim — a curated, batteries-included config built on lazy.nvim. LSP, completion, and UI ready in minutes.</div>
+      <div class="hc-tags">
+        <span class="hc-tag">Distro</span>
+        <span class="hc-tag">lazy.nvim</span>
+        <span class="hc-tag">Preconfigured</span>
+      </div>
+      <div class="hc-cta">Explore LazyVim <span class="hc-arr">→</span></div>
     </div>
   </a>
 
@@ -840,6 +925,32 @@
         <span class="hc-tag">Hands-on</span>
       </div>
       <div class="hc-cta">Start practicing <span class="hc-arr">→</span></div>
+    </div>
+  </a>
+
+  <!-- ── GAME ─────────────────────────────────────────── -->
+  <a href="game.html" class="hcard" style="--ca: var(--accent2)">
+    <div class="hc-vis">
+      <div class="vis-arcade">
+        <div class="varc-row">
+          <div class="varc-node done">★</div>
+          <div class="varc-line varc-l1"></div>
+          <div class="varc-node done">★</div>
+          <div class="varc-line varc-l2"></div>
+          <div class="varc-node current">3</div>
+        </div>
+        <div class="varc-label">World 1 &middot; Level 3</div>
+      </div>
+    </div>
+    <div class="hc-body">
+      <div class="hc-title">Keystroke Arcade</div>
+      <div class="hc-desc">A game built on everything you've learned — clear worlds of bite-sized levels and earn stars for speed and precision.</div>
+      <div class="hc-tags">
+        <span class="hc-tag">Game</span>
+        <span class="hc-tag">Levels</span>
+        <span class="hc-tag">Stars</span>
+      </div>
+      <div class="hc-cta">Enter the arcade <span class="hc-arr">→</span></div>
     </div>
   </a>
 

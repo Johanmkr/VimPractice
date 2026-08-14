@@ -1189,6 +1189,7 @@ function freshState(ex) {
   return {
     lines: ex.content.map(l => l),
     cursor: { row: 0, col: 0 },
+    keyCount: 0,
 
     // Mode state machine
     mode: 'normal',
@@ -1417,6 +1418,7 @@ function handleKey(e) {
   // Allow some browser shortcuts
   if (e.ctrlKey && !['d','u','f','b','r','v','['].includes(e.key.toLowerCase())) return;
   e.preventDefault();
+  state.keyCount++;
 
   const key = resolveKey(e);
 

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Guide — LazyVim</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .diff-section {
+      margin-bottom: 3rem;
+    }
+    .diff-section h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--fg);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.6rem;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ── Flow banner: Vim -> Neovim -> LazyVim ───────────── */
+    .flow-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+      padding: 1.4rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .flow-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: 8px;
+      min-width: 110px;
+    }
+    .flow-step .fs-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .flow-step .fs-sub {
+      font-size: 0.68rem;
+      color: var(--fg3);
+      text-align: center;
+    }
+    .flow-step.fs-vim { color: var(--orange); }
+    .flow-step.fs-nvim { color: var(--accent); }
+    .flow-step.fs-lazy { color: var(--accent2); border: 1px solid var(--accent2); background: rgba(187,154,247,0.08); }
+    .flow-arrow {
+      color: var(--fg3);
+      font-size: 1.3rem;
+    }
+    @media (max-width: 700px) {
+      .flow-banner { flex-direction: column; }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+
+    .vim-nvim-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+    .intro-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    .intro-card.nvim-card { border-top: 3px solid var(--accent); }
+    .intro-card.lazy-card { border-top: 3px solid var(--accent2); }
+    .intro-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .intro-card.nvim-card h3 { color: var(--accent); }
+    .intro-card.lazy-card h3 { color: var(--accent2); }
+    .intro-card .version {
+      font-size: 0.75rem;
+      color: var(--fg3);
+      margin-bottom: 0.8rem;
+    }
+    .intro-card p {
+      color: var(--fg2);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+    .compare-table th.lazy-col { color: var(--accent2); }
+    @media (max-width: 700px) {
+      .vim-nvim-intro { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="basics.html">Basics</a></li>
+    <li><a href="advanced.html">Advanced</a></li>
+    <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="lazyvim.html" class="active">LazyVim</a></li>
+    <li><a href="vscode-to-nvim.html">VS Code → Nvim</a></li>
+    <li><a href="tutorial.html">Tutorial</a></li>
+    <li><a href="copilot.html">Copilot</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+    <li><a href="practice.html">Practice</a></li>
+    <li><a href="game.html">Game</a></li>
+  </ul>
+</nav>
+
+<div class="page-header">
+  <div class="container">
+    <h1>Neovim vs LazyVim</h1>
+    <p>The next step after Neovim — a curated, batteries-included config framework built on lazy.nvim.</p>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- FLOW -->
+  <div class="flow-banner">
+    <div class="flow-step fs-vim">
+      <div class="fs-name">Vim</div>
+      <div class="fs-sub">the foundation<br>modal editing</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step fs-nvim">
+      <div class="fs-name">Neovim</div>
+      <div class="fs-sub">the platform<br>Lua, LSP, Treesitter</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step fs-lazy">
+      <div class="fs-name">LazyVim</div>
+      <div class="fs-sub">the distro<br>curated & ready to go</div>
+    </div>
+  </div>
+
+  <!-- INTRO CARDS -->
+  <div class="vim-nvim-intro">
+    <div class="intro-card nvim-card">
+      <h3>Neovim (vanilla / DIY)</h3>
+      <div class="version">Just the editor &mdash; you write <code>init.lua</code> from scratch</div>
+      <p>A blank canvas. Neovim ships with a native LSP client, Treesitter, and a Lua API, but none of it is wired up. You choose every plugin, every keymap, every default. Total control, but hours (or weeks) of config work before it feels like an IDE.</p>
+    </div>
+    <div class="intro-card lazy-card">
+      <h3>LazyVim</h3>
+      <div class="version">A Neovim <em>distribution</em> &mdash; by folke, built on lazy.nvim</div>
+      <p>A pre-configured, opinionated Neovim setup: LSP, completion, formatting, linting, Treesitter, a file explorer, fuzzy finder, statusline, and sane keymaps all wired together out of the box. You extend it with small plugin-spec files instead of building the whole stack yourself.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Important:</strong> LazyVim is not a fork or a competitor to Neovim &mdash; it <em>is</em> Neovim, just pre-configured. It's a starting <code>init.lua</code> plus a plugin/config structure built on the <a href="https://github.com/folke/lazy.nvim" target="_blank">lazy.nvim</a> plugin manager. You can always eject and go back to a bare config.
+  </div>
+
+  <!-- BIG TABLE -->
+  <div class="diff-section">
+    <h2>&#9878; Feature Comparison</h2>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th class="feature-col">Feature</th>
+          <th class="nvim-col">Neovim (vanilla)</th>
+          <th class="lazy-col">LazyVim</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-col">Setup time</td>
+          <td>Hours&ndash;weeks (DIY)</td>
+          <td><span class="tag tag-yes">minutes</span></td>
+          <td class="key-desc"><code>git clone</code> the starter, open <code>nvim</code>, plugins install automatically.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Plugin manager</td>
+          <td>None by default</td>
+          <td><span class="tag tag-native">lazy.nvim</span></td>
+          <td class="key-desc">LazyVim is built directly on top of lazy.nvim &mdash; lockfile, lazy-loading, UI included.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">LSP configuration</td>
+          <td><span class="tag tag-native">built-in client</span>, manual setup</td>
+          <td><span class="tag tag-yes">pre-wired</span> + Mason</td>
+          <td class="key-desc">LazyVim auto-installs language servers via <code>mason.nvim</code> and configures them per-language.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Autocompletion</td>
+          <td><span class="tag tag-no">none</span> (plugin required)</td>
+          <td><span class="tag tag-yes">included</span> (nvim-cmp/blink.cmp)</td>
+          <td class="key-desc">Snippets, LSP completion, and command-line completion all pre-configured.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Treesitter</td>
+          <td><span class="tag tag-native">built-in</span>, no parsers</td>
+          <td><span class="tag tag-yes">auto-installed parsers</span></td>
+          <td class="key-desc">LazyVim installs and updates parsers for languages you use automatically.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">File explorer</td>
+          <td><span class="tag tag-no">netrw only</span></td>
+          <td><span class="tag tag-yes">neo-tree</span></td>
+          <td class="key-desc">Modern sidebar tree with git status, preview, and fuzzy filtering.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Fuzzy finder</td>
+          <td><span class="tag tag-no">none</span></td>
+          <td><span class="tag tag-yes">Telescope / fzf-lua</span></td>
+          <td class="key-desc">Find files, grep, buffers, symbols &mdash; all pre-bound to <kbd>&lt;leader&gt;</kbd> keymaps.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Statusline / UI</td>
+          <td>Plain default</td>
+          <td><span class="tag tag-yes">lualine, bufferline, dashboard</span></td>
+          <td class="key-desc">Polished UI out of the box: icons, tabs, breadcrumbs, start screen.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Keymap discoverability</td>
+          <td>None built-in</td>
+          <td><span class="tag tag-native">which-key</span></td>
+          <td class="key-desc">Press <kbd>&lt;leader&gt;</kbd> and a popup shows every available keymap, grouped and labeled.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Formatting / linting</td>
+          <td><span class="tag tag-no">manual</span></td>
+          <td><span class="tag tag-yes">conform.nvim + nvim-lint</span></td>
+          <td class="key-desc">Format-on-save and linters pre-mapped per filetype, auto-installed via Mason.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Config structure</td>
+          <td>One <code>init.lua</code> (your choice)</td>
+          <td><span class="tag tag-partial">opinionated modules</span></td>
+          <td class="key-desc">LazyVim splits config into <code>lua/plugins/*.lua</code> spec files &mdash; easy to add, override, or disable.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Language extras</td>
+          <td>N/A</td>
+          <td><span class="tag tag-native">:LazyExtras</span></td>
+          <td class="key-desc">One-command toggles for language packs (Python, Rust, Go, TypeScript, etc.) with full LSP+DAP+lint stacks.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Health checks</td>
+          <td><code>:checkhealth</code> (core only)</td>
+          <td><code>:checkhealth</code> <span class="tag tag-yes">+ LazyVim checks</span></td>
+          <td class="key-desc">LazyVim adds its own health checks covering the whole preconfigured stack.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Updating</td>
+          <td>Manual, per-plugin</td>
+          <td><span class="tag tag-yes">:Lazy update</span></td>
+          <td class="key-desc">Single command updates all plugins with a lockfile diff and changelog view.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Customization ceiling</td>
+          <td><span class="tag tag-yes">unlimited</span></td>
+          <td><span class="tag tag-yes">unlimited</span> (it's still Neovim)</td>
+          <td class="key-desc">Every LazyVim default can be overridden or removed &mdash; nothing is locked in.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Learning curve</td>
+          <td>Steep (build everything)</td>
+          <td>Gentle (learn on top of good defaults)</td>
+          <td class="key-desc">LazyVim teaches good keymap conventions as you use it, via which-key hints.</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Opinionatedness</td>
+          <td>None &mdash; a blank slate</td>
+          <td>High &mdash; sane defaults chosen for you</td>
+          <td class="key-desc">A trade-off: less bikeshedding, but you inherit someone else's choices.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- KEY BENEFITS -->
+  <div class="diff-section">
+    <h2>&#9889; Why People Move to LazyVim</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2);">Zero to IDE in Minutes</div>
+        <p class="key-desc">Cloning the LazyVim starter and opening <code>nvim</code> gives you LSP, completion, formatting, git signs, fuzzy finding, and a file tree immediately &mdash; the setup that normally takes a DIY config days or weeks to reach.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2);">Curated, Not Random</div>
+        <p class="key-desc">Instead of picking one plugin out of ten competing options for every feature, LazyVim has already made (and tested) that choice. You get a coherent, working stack rather than a pile of plugins that may or may not play nicely together.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2);">Discoverable Keymaps</div>
+        <p class="key-desc">which-key surfaces every keybinding contextually as you type <kbd>&lt;leader&gt;</kbd>, so you learn the config by using it instead of memorizing a cheatsheet or reading someone else's <code>init.lua</code>.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2);">Language Packs on Demand</div>
+        <p class="key-desc"><code>:LazyExtras</code> opens a picker of language/tooling bundles (Python, Rust, Go, Docker, Markdown, …). Toggle one on and LazyVim installs the LSP server, formatter, linter, and Treesitter parser together.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2);">Still Just Neovim</div>
+        <p class="key-desc">LazyVim isn't a black box &mdash; it's readable Lua you can inspect, override, or delete. Every default lives in a plugin spec you can find and change. Nothing about it locks you out of raw Neovim.</p>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2);">Active Maintenance</div>
+        <p class="key-desc">Plugin compatibility, breaking changes, and new Neovim features get absorbed by the LazyVim maintainers and community, instead of landing on you to track down and fix individually.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRADEOFFS -->
+  <div class="diff-section">
+    <h2>&#9878; The Trade-offs</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title" style="color:var(--accent);">Keep Vanilla Neovim If…</div>
+        <ul style="margin-top:0.2rem;padding-left:1.2rem;color:var(--fg2);font-size:0.85rem;line-height:1.8;">
+          <li>You want to understand every line of your config</li>
+          <li>You enjoy the process of building your own setup</li>
+          <li>You need a truly minimal footprint (e.g. on remote servers)</li>
+          <li>You already have a config you're happy with</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title" style="color:var(--accent2);">Switch to LazyVim If…</div>
+        <ul style="margin-top:0.2rem;padding-left:1.2rem;color:var(--fg2);font-size:0.85rem;line-height:1.8;">
+          <li>You want IDE features working on day one</li>
+          <li>You'd rather write code than maintain a config</li>
+          <li>You're new to Neovim and want good defaults to learn from</li>
+          <li>You want a maintained, community-tested plugin stack</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout warn">
+      <strong>Watch out:</strong> Because LazyVim makes opinionated choices, you'll spend some time reading its docs to learn <em>why</em> something is bound the way it is before you override it. That's a small cost compared to building the same stack yourself.
+    </div>
+  </div>
+
+  <!-- GETTING STARTED -->
+  <div class="diff-section">
+    <h2>&#128260; Getting Started with LazyVim</h2>
+    <div class="callout tip">
+      <strong>Prerequisite:</strong> Neovim 0.9+ (LazyVim tracks recent Neovim releases closely — check <a href="https://www.lazyvim.org/" target="_blank">lazyvim.org</a> for the current minimum version).
+    </div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">Step 1 — Back Up Existing Config</div>
+        <p class="key-desc">Move any current Neovim config aside so LazyVim starts clean:</p>
+        <pre><code>mv ~/.config/nvim ~/.config/nvim.bak
+mv ~/.local/share/nvim ~/.local/share/nvim.bak
+mv ~/.local/state/nvim ~/.local/state/nvim.bak
+mv ~/.cache/nvim ~/.cache/nvim.bak</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-title">Step 2 — Clone the Starter</div>
+        <p class="key-desc">Clone the official starter template and remove its git history so it's yours:</p>
+        <pre><code>git clone https://github.com/LazyVim/starter \
+  ~/.config/nvim
+rm -rf ~/.config/nvim/.git</code></pre>
+      </div>
+      <div class="card">
+        <div class="card-title">Step 3 — Launch Neovim</div>
+        <p class="key-desc">Open <code>nvim</code>. lazy.nvim bootstraps itself and installs every plugin automatically:</p>
+        <pre><code>nvim</code></pre>
+        <p class="key-desc" style="margin-top:0.5rem;">Wait for installation to finish, then restart.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Step 4 — Explore & Extend</div>
+        <p class="key-desc">Add language support and inspect your setup:</p>
+        <pre><code>:LazyExtras   " toggle language packs
+:Lazy         " manage plugins
+:checkhealth  " verify the install
+:LazyVim      " changelog & docs</code></pre>
+        <p class="key-desc" style="margin-top:0.5rem;">Add custom plugins in <code>lua/plugins/*.lua</code> &mdash; each file returns a lazy.nvim plugin spec.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHEN TO USE WHICH -->
+  <div class="diff-section">
+    <h2>&#9878; The Full Flow, Summarized</h2>
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Stage</th>
+          <th>What it gives you</th>
+          <th>Best for</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="feature-col">Vim</td>
+          <td class="key-desc">Modal editing muscle memory &mdash; motions, operators, registers</td>
+          <td class="key-desc">Learning the core skill that transfers everywhere</td>
+        </tr>
+        <tr>
+          <td class="feature-col">Neovim</td>
+          <td class="key-desc">Lua scripting, built-in LSP/Treesitter, an extensible platform</td>
+          <td class="key-desc">Building exactly the editor you want, piece by piece</td>
+        </tr>
+        <tr>
+          <td class="feature-col">LazyVim</td>
+          <td class="key-desc">All of the above, pre-assembled into a working IDE</td>
+          <td class="key-desc">Getting productive fast without losing the ability to customize</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout">
+      <strong>Bottom line:</strong> Learn Vim motions first &mdash; they're the transferable skill. Learn what Neovim adds so you understand what's happening under the hood. Then, unless you specifically enjoy building editor config from scratch, let <strong>LazyVim</strong> assemble the stack for you and spend your time writing code instead.
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <p>Neovim Guide &mdash; <a href="https://www.lazyvim.org/" target="_blank">lazyvim.org</a> &mdash; <a href="practice.html">Practice Now</a></p>
+</footer>
+
+</body>
+</html>

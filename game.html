@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neovim Guide — Keystroke Arcade</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      /* Star-tier semantic aliases — point at existing palette vars, not new colors */
+      --tier-gold:   var(--green);
+      --tier-silver: var(--teal);
+      --tier-bronze: var(--yellow);
+      --tier-over:   var(--red);
+
+      /* Matches practice.html's own .diff-2 / .lh-2 accent (#2ac3de) */
+      --world-cyan: #2ac3de;
+
+      --node-size: 44px;
+      --boss-size: 64px;
+    }
+
+    @media (max-width: 700px) {
+      :root {
+        --node-size: 34px;
+        --boss-size: 48px;
+      }
+    }
+
+    /* ===================== WORLD MAP ===================== */
+    #world-list { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1.5rem; }
+
+    .arcade-world {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .arcade-world.locked { cursor: not-allowed; }
+    .arcade-world:not(.locked) .arcade-world-header:hover { border-color: var(--fg3); }
+
+    .arcade-world-header {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      height: 56px;
+      padding: 0 1rem;
+      user-select: none;
+    }
+
+    .arcade-world-glyph {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .arcade-world-glyph kbd { border: none; background: transparent; padding: 0; font-size: 0.62rem; color: inherit; }
+
+    .arcade-world-title {
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .world-cleared-check { color: var(--green); font-size: 0.75rem; margin-left: 0.2rem; }
+
+    .arcade-world-stats {
+      margin-left: auto;
+      color: var(--fg2);
+      font-size: 0.78rem;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .arcade-world.locked .arcade-world-stats { color: var(--fg3); }
+
+    .arcade-world-chevron {
+      color: var(--fg3);
+      font-size: 0.85rem;
+      transition: transform 0.15s;
+      width: 1rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .arcade-world-caption {
+      padding: 0 1rem 0.9rem 3.5rem;
+      font-size: 0.78rem;
+      color: var(--fg3);
+    }
+
+    .arcade-rail {
+      display: flex;
+      align-items: center;
+      padding: 1.4rem 1.2rem 1rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      min-height: 140px;
+      border-top: 1px solid var(--border);
+    }
+
+    .arcade-node-wrap, .arcade-boss-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .arcade-node {
+      width: var(--node-size);
+      height: var(--node-size);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      background: var(--bg3);
+      border: 2px solid var(--accent);
+      color: var(--fg);
+      position: relative;
+    }
+    .arcade-node.locked {
+      background: var(--bg2);
+      border: 1px dashed var(--fg3);
+      opacity: 0.55;
+      color: transparent;
+    }
+    .arcade-node.locked::before {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 6px;
+      background: var(--fg3);
+      border-radius: 2px 2px 0 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -20%);
+    }
+    .arcade-node.locked::after {
+      content: '';
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      border: 1.5px solid var(--fg3);
+      border-bottom: none;
+      border-radius: 50% 50% 0 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -95%);
+    }
+    .arcade-node.node-next {
+      box-shadow: 0 0 0 3px rgba(122, 162, 247, 0.18);
+      animation: node-pulse 2.2s ease-in-out infinite;
+    }
+    @keyframes node-pulse {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(122, 162, 247, 0.18); }
+      50%      { box-shadow: 0 0 0 3px rgba(122, 162, 247, 0.32); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .arcade-node.node-next { animation: none; }
+    }
+
+    .arcade-pips {
+      margin-top: 0.35rem;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      text-align: center;
+    }
+    .pip-locked { color: var(--fg3); }
+
+    .arcade-next-caption {
+      margin-top: 0.15rem;
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .arcade-connector {
+      width: 32px;
+      height: 3px;
+      background: var(--border);
+      flex-shrink: 0;
+      margin: 0 0.1rem;
+      align-self: center;
+      margin-bottom: 1.1rem;
+    }
+    .arcade-connector.earned { background: var(--green); }
+
+    .arcade-boss {
+      width: var(--boss-size);
+      height: var(--boss-size);
+      transform: rotate(45deg);
+      background: var(--bg3);
+      border: 2px solid var(--red);
+      box-shadow: 0 0 0 4px rgba(247, 118, 142, 0.12);
+      position: relative;
+    }
+    .arcade-boss.cleared {
+      border-color: var(--green);
+      box-shadow: 0 0 0 4px rgba(158, 206, 106, 0.12);
+    }
+    .arcade-boss.locked {
+      border: 1px dashed var(--fg3);
+      opacity: 0.5;
+      box-shadow: none;
+    }
+    .arcade-boss-caption {
+      margin-top: 0.4rem;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 700px) {
+      .arcade-world-glyph { width: 22px; height: 22px; }
+      .arcade-world-stats, .arcade-world-chevron { font-size: 0.72rem; }
+      .arcade-connector { width: 20px; }
+    }
+
+    /* ===================== LEVEL / PLAY VIEW ===================== */
+    #view-play {
+      display: none;
+      flex-direction: column;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+    }
+
+    .editor-topbar {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      padding: 0.4rem 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 0.6rem;
+    }
+    .editor-btns { display: flex; gap: 0.4rem; flex-shrink: 0; }
+    .ctrl-btn {
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--fg2);
+      font-family: inherit;
+      font-size: 0.75rem;
+      padding: 0.28rem 0.65rem;
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    .ctrl-btn:hover { background: var(--bg2); color: var(--fg); border-color: var(--fg3); }
+
+    /* HUD bar */
+    #arcade-hud {
+      height: 34px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      font-size: 0.78rem;
+      flex-shrink: 0;
+    }
+    .hud-left {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      min-width: 0;
+    }
+    .hud-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .hud-worldlevel {
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--fg3);
+      font-size: 0.68rem;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .hud-title {
+      color: var(--fg2);
+      font-weight: 400;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    .hud-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-shrink: 0;
+    }
+    #hud-keys, #hud-par { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.85rem; }
+    #hud-par, .hud-sep { color: var(--fg3); }
+    #hud-keys.tier-gold, #hud-stars.tier-gold     { color: var(--tier-gold); }
+    #hud-keys.tier-silver, #hud-stars.tier-silver { color: var(--tier-silver); }
+    #hud-keys.tier-bronze, #hud-stars.tier-bronze { color: var(--tier-bronze); }
+    #hud-keys.tier-over, #hud-stars.tier-over     { color: var(--tier-over); }
+    #hud-stars { font-size: 0.8rem; letter-spacing: 2px; }
+
+    #hud-hint {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      padding: 0.45rem 0.9rem;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+      display: none;
+    }
+    .goal-label { color: var(--teal); font-weight: 700; }
+    .hint-label { color: var(--yellow); }
+
+    /* Reused editor DOM (verbatim structure from practice.html) */
+    #vim-editor {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg);
+      cursor: text;
+      outline: none;
+      display: flex;
+      flex-direction: column;
+    }
+    #editor-lines {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.3rem 0;
+      font-size: 14px;
+      line-height: 21px;
+    }
+    .editor-line { display: flex; min-height: 21px; }
+    .line-number {
+      color: var(--fg3);
+      text-align: right;
+      padding: 0 0.7rem 0 0.4rem;
+      min-width: 38px;
+      user-select: none;
+      flex-shrink: 0;
+      font-size: 13px;
+    }
+    .cursor-line .line-number { color: var(--fg2); }
+    .line-content {
+      flex: 1;
+      white-space: pre;
+      padding-right: 1rem;
+      tab-size: 2;
+      font-size: 14px;
+    }
+    .cursor-line .line-content { background: rgba(255,255,255,0.035); }
+    .char-cursor { background: var(--fg); color: var(--bg2); border-radius: 1px; }
+    .char-cursor.insert-cursor {
+      background: transparent;
+      color: inherit;
+      border-left: 2px solid var(--green);
+      margin-left: -1px;
+    }
+    .char-selected { background: rgba(122,162,247,0.25); color: var(--accent2); }
+
+    #statusline {
+      background: var(--accent);
+      color: var(--bg);
+      padding: 0.18rem 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      min-height: 24px;
+      letter-spacing: 0.02em;
+    }
+    #statusline.insert-mode  { background: var(--green); }
+    #statusline.visual-mode  { background: var(--accent2); }
+    #statusline.command-mode { background: var(--yellow); }
+    #statusline.replace-mode { background: var(--red); }
+    .status-right { font-weight: 400; opacity: 0.8; }
+
+    #cmdline-wrap {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 0.2rem 0.8rem;
+      font-size: 0.85rem;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      color: var(--fg);
+      flex-shrink: 0;
+    }
+
+    /* Success flash — base position/animation preserved, arcade content extends it */
+    .success-flash {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--green);
+      color: var(--bg);
+      padding: 0.75rem 2.2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 1.15rem;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .success-flash.show { opacity: 1; }
+    .success-flash.arcade-clear {
+      background: var(--bg3);
+      border: 2px solid var(--fg3);
+      color: var(--fg);
+      pointer-events: auto;
+      white-space: normal;
+      text-align: center;
+      padding: 1.1rem 1.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      min-width: 260px;
+    }
+    .success-flash.arcade-clear.tier-gold   { border-color: var(--tier-gold); }
+    .success-flash.arcade-clear.tier-silver { border-color: var(--tier-silver); }
+    .success-flash.arcade-clear.tier-bronze { border-color: var(--tier-bronze); }
+    .clear-title { font-size: 1rem; letter-spacing: 0.08em; }
+    .clear-stars { font-size: 1.6rem; letter-spacing: 3px; }
+    .success-flash.tier-gold .clear-stars   { color: var(--tier-gold); }
+    .success-flash.tier-silver .clear-stars { color: var(--tier-silver); }
+    .success-flash.tier-bronze .clear-stars { color: var(--tier-bronze); }
+    .clear-stats { font-size: 0.8rem; color: var(--fg3); font-weight: 400; }
+    .clear-actions { display: flex; gap: 0.6rem; margin-top: 0.3rem; }
+    .clear-actions .btn { padding: 0.5rem 1.1rem; font-size: 0.82rem; }
+
+    .key-press-display {
+      position: absolute;
+      bottom: 0.5rem;
+      right: 0.8rem;
+      background: var(--bg4);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--orange);
+      opacity: 0;
+      transition: opacity 0.15s;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .key-press-display.visible { opacity: 1; }
+
+    @media (max-width: 700px) {
+      #arcade-hud {
+        height: 52px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.2rem;
+        padding: 0.4rem 0.9rem;
+      }
+      .hud-title { display: none; }
+      .hud-right { justify-content: flex-end; }
+      .success-flash.arcade-clear { width: calc(100vw - 2rem); max-width: 320px; min-width: 0; }
+      .clear-actions { flex-direction: column; width: 100%; }
+      .clear-actions .btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">NV<span>IM</span> Guide</a>
+  <ul>
+    <li><a href="basics.html">Basics</a></li>
+    <li><a href="advanced.html">Advanced</a></li>
+    <li><a href="vs-vim.html">Vim vs Neovim</a></li>
+    <li><a href="lazyvim.html">LazyVim</a></li>
+    <li><a href="vscode-to-nvim.html">VS Code → Nvim</a></li>
+    <li><a href="tutorial.html">Tutorial</a></li>
+    <li><a href="copilot.html">Copilot</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+    <li><a href="practice.html">Practice</a></li>
+    <li><a href="game.html" class="active">Game</a></li>
+  </ul>
+</nav>
+
+<!-- ===================== WORLD MAP VIEW ===================== -->
+<div id="view-map">
+  <div class="page-header">
+    <div class="container">
+      <h1>Keystroke Arcade</h1>
+      <p>Clear levels under par. Fewer keystrokes, more stars.</p>
+    </div>
+  </div>
+  <div class="container">
+    <div id="world-list"></div>
+  </div>
+</div>
+
+<!-- ===================== LEVEL / PLAY VIEW ===================== -->
+<div id="view-play">
+  <div class="editor-topbar">
+    <button class="ctrl-btn" onclick="showMapView()">← Map</button>
+    <span id="editor-filename" style="display:none;"></span>
+    <div class="editor-btns">
+      <button class="ctrl-btn" onclick="resetLevel()">Reset</button>
+      <button class="ctrl-btn" onclick="showLevelHint()">Hint</button>
+    </div>
+  </div>
+
+  <div id="arcade-hud">
+    <div class="hud-left">
+      <span class="hud-dot" id="hud-world-dot"></span>
+      <span class="hud-worldlevel" id="hud-worldlevel">WORLD · LVL 01</span>
+      <span class="hud-title" id="hud-title"></span>
+    </div>
+    <div class="hud-right">
+      <span id="hud-keys">0</span><span class="hud-sep"> / </span><span id="hud-par">0</span>
+      <span id="hud-stars">☆☆☆</span>
+    </div>
+  </div>
+
+  <div id="hud-hint"></div>
+
+  <!-- editor-filename / task-instruction below are unused by the game UI but must exist:
+       practice.js's own DOMContentLoaded boot unconditionally calls loadExercise(0), which
+       writes into both via a plain (unguarded) getElementById(...) — if either is missing,
+       that write throws and aborts the boot listener before it reaches the line that binds
+       handleKey to #vim-editor's keydown, silently breaking all input on this page. -->
+  <div id="vim-editor" tabindex="0">
+    <div id="editor-lines"></div>
+    <div class="success-flash" id="success-flash"></div>
+    <div class="key-press-display" id="key-display"></div>
+  </div>
+
+  <div id="statusline">
+    <span id="status-mode">NORMAL</span>
+    <span class="status-right" id="status-pos">1:1</span>
+  </div>
+
+  <div id="cmdline-wrap">
+    <span id="cmdline-text"></span>
+  </div>
+
+  <div id="task-instruction" style="display:none;"></div>
+</div>
+
+<footer>
+  <p>Neovim Guide &mdash; <a href="https://neovim.io" target="_blank">neovim.io</a> &mdash; <a href="practice.html">Practice Now</a></p>
+</footer>
+
+<script src="practice.js"></script>
+<script src="levels.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
